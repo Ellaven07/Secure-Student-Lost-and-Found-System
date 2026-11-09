@@ -1,5 +1,5 @@
 
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Manage Student Accounts | Manoa')
 @section('page-label', 'Student Management')
@@ -208,10 +208,16 @@
         </p>
     </div>
 
-    <button class="add-student-btn" type="button">
+    <a class="add-student-btn" href="{{ route('admin.students.create') }}">
         + Add Student
-    </button>
+    </a>
 </div>
+
+@if (session('status'))
+    <div class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
+        {{ session('status') }}
+    </div>
+@endif
 
 <div class="stats-grid">
 

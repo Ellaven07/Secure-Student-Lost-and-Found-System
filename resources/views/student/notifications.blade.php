@@ -1,5 +1,5 @@
 
-@extends('layouts.app')
+@extends('layouts.student')
 
 @section('title', 'Notifications')
 @section('page-label', 'Notifications')
