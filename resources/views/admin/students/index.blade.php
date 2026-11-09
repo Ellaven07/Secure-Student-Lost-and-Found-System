@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 
 @section('title', 'Manage Student Accounts')
@@ -7,13 +6,9 @@
 @section('content')
 
 <style>
-    .student-page {
-        color: #26382e;
-    }
+    .student-page { color: #26382e; }
 
-    .student-header {
-        margin-bottom: 24px;
-    }
+    .student-header { margin-bottom: 24px; }
 
     .student-header h1 {
         font-size: 23px;
@@ -43,9 +38,7 @@
         padding: 5px 24px;
     }
 
-    .stat-item:first-child {
-        padding-left: 5px;
-    }
+    .stat-item:first-child { padding-left: 5px; }
 
     .stat-item + .stat-item {
         border-left: 1px solid #dfe6e0;
@@ -107,10 +100,29 @@
         color: #8a968e;
     }
 
+    .add-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        height: 37px;
+        padding: 0 15px;
+        border-radius: 6px;
+        background: #174b38;
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .2s;
+    }
+
+    .add-button:hover { background: #28634c; }
+
     .student-controls {
         display: flex;
         gap: 9px;
         flex-wrap: wrap;
+        width: 100%;
     }
 
     .search-input,
@@ -128,6 +140,11 @@
 
     .search-input {
         width: 220px;
+        flex: 1 1 190px;
+    }
+
+    .status-filter {
+        min-width: 125px;
     }
 
     .search-input:focus,
@@ -135,25 +152,35 @@
         border-color: #397b5b;
     }
 
-    .search-button {
+    .search-button,
+    .reset-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         height: 37px;
         padding: 0 15px;
-        border: none;
         border-radius: 6px;
-        background: #174b38;
-        color: white;
         font-size: 11px;
         font-weight: 700;
+        text-decoration: none;
         cursor: pointer;
     }
 
-    .search-button:hover {
-        background: #28634c;
+    .search-button {
+        border: none;
+        background: #174b38;
+        color: white;
     }
 
-    .table-wrapper {
-        overflow-x: auto;
+    .search-button:hover { background: #28634c; }
+
+    .reset-button {
+        border: 1px solid #dfe7e0;
+        color: #526157;
+        background: white;
     }
+
+    .table-wrapper { overflow-x: auto; }
 
     .student-table {
         width: 100%;
@@ -163,7 +190,7 @@
     }
 
     .student-table th {
-        padding: 13px 19px;
+        padding: 13px 15px;
         background: #f8faf8;
         color: #849188;
         font-size: 10px;
@@ -173,15 +200,13 @@
     }
 
     .student-table td {
-        padding: 14px 19px;
+        padding: 14px 15px;
         border-bottom: 1px solid #eff2ef;
         color: #526157;
         font-size: 11px;
     }
 
-    .student-table tbody tr:hover {
-        background: #fbfdfb;
-    }
+    .student-table tbody tr:hover { background: #fbfdfb; }
 
     .student-person {
         display: flex;
@@ -192,13 +217,13 @@
     .student-avatar {
         display: grid;
         place-items: center;
-        width: 34px;
-        height: 34px;
+        width: 35px;
+        height: 35px;
         flex-shrink: 0;
         border-radius: 50%;
         background: #e7efe7;
         color: #20533a;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -232,6 +257,29 @@
         color: #737d75;
     }
 
+    .action-links {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .action-links a,
+    .action-links button {
+        border: 0;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .view-link { color: #28634c; }
+    .edit-link { color: #3976a5; }
+    .toggle-link { color: #b45353; }
+    .activate-link { color: #267246; }
+
     .empty-state {
         padding: 35px 20px;
         color: #89958d;
@@ -255,9 +303,7 @@
         justify-content: flex-end;
     }
 
-    .pagination-wrapper nav div:first-child {
-        display: none;
-    }
+    .pagination-wrapper nav div:first-child { display: none; }
 
     .pagination-wrapper nav div:last-child {
         display: flex;
@@ -304,13 +350,9 @@
             border-left: none;
         }
 
-        .panel-heading {
-            align-items: flex-start;
-        }
+        .panel-heading { align-items: flex-start; }
 
-        .student-controls {
-            width: 100%;
-        }
+        .student-controls { width: 100%; }
 
         .search-input {
             flex: 1;
@@ -326,14 +368,17 @@
         <p class="page-description">
             View and monitor registered student accounts.
         </p>
-        <a href="{{ route('admin.students.create') }}" class="mt-4 inline-flex items-center rounded-lg bg-[#174b38] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#28634c]">
-            + Add Student
-        </a>
     </div>
 
-    @if (session('status'))
+    @if (session('success'))
         <div class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status">
-            {{ session('status') }}
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            {{ session('error') }}
         </div>
     @endif
 
@@ -375,6 +420,12 @@
                 </div>
             </div>
 
+            <a href="{{ route('admin.students.create') }}" class="add-button">
+                + Add Student
+            </a>
+        </div>
+
+        <div class="panel-heading">
             <form method="GET"
                   action="{{ route('admin.students.index') }}"
                   class="student-controls">
@@ -383,15 +434,38 @@
                     type="text"
                     name="search"
                     class="search-input"
-                    placeholder="Search student..."
+                    placeholder="Search name, email or student ID..."
                     value="{{ request('search') }}"
                 >
 
-                <select
-                    name="status"
-                    class="status-filter"
-                    onchange="this.form.submit()">
+                <select name="department" class="status-filter">
+                    <option value="">All Departments</option>
+                    @foreach ($departments as $department)
+                        <option value="{{ $department }}" @selected(request('department') === $department)>
+                            {{ $department }}
+                        </option>
+                    @endforeach
+                </select>
 
+                <select name="course" class="status-filter">
+                    <option value="">All Courses</option>
+                    @foreach ($courses as $course)
+                        <option value="{{ $course }}" @selected(request('course') === $course)>
+                            {{ $course }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="year_level" class="status-filter">
+                    <option value="">All Year Levels</option>
+                    @foreach ($yearLevels as $year)
+                        <option value="{{ $year }}" @selected(request('year_level') === $year)>
+                            {{ $year }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="status" class="status-filter">
                     <option value="">All Status</option>
                     <option value="active" @selected(request('status') === 'active')>
                         Active
@@ -399,12 +473,17 @@
                     <option value="inactive" @selected(request('status') === 'inactive')>
                         Inactive
                     </option>
-
                 </select>
 
                 <button type="submit" class="search-button">
-                    Search
+                    Apply Filters
                 </button>
+
+                @if (request()->query())
+                    <a href="{{ route('admin.students.index') }}" class="reset-button">
+                        Reset
+                    </a>
+                @endif
 
             </form>
         </div>
@@ -415,20 +494,21 @@
                 <thead>
                     <tr>
                         <th>Student</th>
-                        <th>Student ID</th>
+                        <th>Student Number</th>
+                        <th>Department</th>
                         <th>Course</th>
                         <th>Year Level</th>
                         <th>Status</th>
+                        <th>Registration Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     @forelse ($students as $student)
-
                         <tr>
                             <td>
                                 <div class="student-person">
-
                                     <div class="student-avatar">
                                         {{ strtoupper(substr($student->name ?? 'S', 0, 1)) }}
                                     </div>
@@ -442,39 +522,59 @@
                                             {{ $student->email }}
                                         </div>
                                     </div>
-
                                 </div>
                             </td>
 
                             <td>{{ $student->student_no ?: '—' }}</td>
-
+                            <td>{{ $student->department ?: '—' }}</td>
                             <td>{{ $student->course ?: '—' }}</td>
-
                             <td>{{ $student->year_level ?: '—' }}</td>
 
                             <td>
                                 @if ($student->status === 'active')
-                                    <span class="status-badge active-status">
-                                        Active
-                                    </span>
+                                    <span class="status-badge active-status">Active</span>
                                 @else
                                     <span class="status-badge inactive-status">
-                                        {{ $student->status ?: 'Inactive' }}
+                                        {{ ucfirst($student->status ?: 'Inactive') }}
                                     </span>
                                 @endif
+                            </td>
+
+                            <td>
+                                {{ $student->created_at?->format('M d, Y') ?? '—' }}
+                            </td>
+
+                            <td>
+                                <div class="action-links">
+                                    <a href="{{ route('admin.students.show', $student) }}"
+                                       class="view-link">View</a>
+
+                                    <a href="{{ route('admin.students.edit', $student) }}"
+                                       class="edit-link">Edit</a>
+
+                                    <form action="{{ route('admin.students.status', $student) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Are you sure you want to change this account status?');">
+                                        @csrf
+                                        @method('PATCH')
+
+                                        <button type="submit"
+                                                class="{{ $student->status === 'active' ? 'toggle-link' : 'activate-link' }}">
+                                            {{ $student->status === 'active' ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
 
                     @empty
-
                         <tr>
-                            <td colspan="5">
+                            <td colspan="8">
                                 <div class="empty-state">
                                     No student records found.
                                 </div>
                             </td>
                         </tr>
-
                     @endforelse
                 </tbody>
 

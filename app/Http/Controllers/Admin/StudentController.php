@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -22,8 +27,7 @@ class StudentController extends Controller
             ->where('status', '!=', 'active')
             ->count();
 
-        $students = User::query()
-            ->where('role', 'student')
+        $students = (clone $studentQuery)
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = trim($request->search);
 
@@ -34,21 +38,208 @@ class StudentController extends Controller
                         ->orWhere('course', 'like', "%{$search}%");
                 });
             })
-            ->when($request->status === 'active', function ($query) {
-                $query->where('status', 'active');
-            })
-            ->when($request->status === 'inactive', function ($query) {
-                $query->where('status', '!=', 'active');
-            })
+            ->when($request->filled('department'), fn ($query) =>
+                $query->where('department', $request->department)
+            )
+            ->when($request->filled('course'), fn ($query) =>
+                $query->where('course', $request->course)
+            )
+            ->when($request->filled('year_level'), fn ($query) =>
+                $query->where('year_level', $request->year_level)
+            )
+            ->when($request->status === 'active', fn ($query) =>
+                $query->where('status', 'active')
+            )
+            ->when($request->status === 'inactive', fn ($query) =>
+                $query->where('status', '!=', 'active')
+            )
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
+
+        $departments = (clone $studentQuery)
+            ->whereNotNull('department')
+            ->where('department', '!=', '')
+            ->distinct()
+            ->orderBy('department')
+            ->pluck('department');
+
+        $courses = (clone $studentQuery)
+            ->whereNotNull('course')
+            ->where('course', '!=', '')
+            ->distinct()
+            ->orderBy('course')
+            ->pluck('course');
+
+        $yearLevels = (clone $studentQuery)
+            ->whereNotNull('year_level')
+            ->where('year_level', '!=', '')
+            ->distinct()
+            ->orderBy('year_level')
+            ->pluck('year_level');
 
         return view('admin.students.index', compact(
             'totalStudents',
             'activeStudents',
             'inactiveStudents',
-            'students'
+            'students',
+            'departments',
+            'courses',
+            'yearLevels'
         ));
+    }
+
+    public function create()
+    {
+        return view('admin.students.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'student_no' => ['nullable', 'string', 'max:50', 'unique:users,student_no'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'course' => ['nullable', 'string', 'max:255'],
+            'year_level' => ['nullable', 'string', 'max:50'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $validated['role'] = 'student';
+
+        $student = User::create($validated);
+
+        $this->logActivity(
+            'Created student account',
+            'Created student account for '.$student->name.'.'
+        );
+
+        return redirect()
+            ->route('admin.students.index')
+            ->with('success', 'Student account created successfully.');
+    }
+
+    public function show(User $student)
+    {
+        $this->ensureStudent($student);
+
+        return view('admin.students.show', compact('student'));
+    }
+
+    public function edit(User $student)
+    {
+        $this->ensureStudent($student);
+
+        return view('admin.students.edit', compact('student'));
+    }
+
+    public function update(Request $request, User $student)
+    {
+        $this->ensureStudent($student);
+
+        $validated = $request->validate([
+            'student_no' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('users', 'student_no')->ignore($student->id),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($student->id),
+            ],
+            'department' => ['nullable', 'string', 'max:255'],
+            'course' => ['nullable', 'string', 'max:255'],
+            'year_level' => ['nullable', 'string', 'max:50'],
+            'status' => ['required', Rule::in(['active', 'inactive'])],
+            'profile_photo' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        if ($request->hasFile('profile_photo')) {
+            if ($student->profile_photo_path) {
+                Storage::disk('public')->delete($student->profile_photo_path);
+            }
+
+            $validated['profile_photo_path'] = $request
+                ->file('profile_photo')
+                ->store('student-profiles', 'public');
+        }
+
+        unset($validated['profile_photo']);
+
+        $student->update($validated);
+
+        $this->logActivity(
+            'Updated student account',
+            'Updated student account for '.$student->name.'.'
+        );
+
+        return redirect()
+            ->route('admin.students.show', $student)
+            ->with('success', 'Student account updated successfully.');
+    }
+
+    public function toggleStatus(User $student)
+    {
+        $this->ensureStudent($student);
+
+        $student->status = $student->status === 'active'
+            ? 'inactive'
+            : 'active';
+
+        $student->save();
+
+        $this->logActivity(
+            'Changed student status',
+            'Changed '.$student->name.' status to '.$student->status.'.'
+        );
+
+        return back()->with('success', 'Student status updated successfully.');
+    }
+
+    public function resetPassword(Request $request, User $student)
+    {
+        $this->ensureStudent($student);
+
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $student->password = $validated['password'];
+        $student->save();
+
+        $this->logActivity(
+            'Reset student password',
+            'Reset password for '.$student->name.'.'
+        );
+
+        return back()->with('success', 'Student password reset successfully.');
+    }
+
+    private function ensureStudent(User $student)
+    {
+        abort_unless($student->role === 'student', 404);
+    }
+
+    private function logActivity(string $action, string $details)
+    {
+        if (!Schema::hasTable('activity_logs')) {
+            return;
+        }
+
+        DB::table('activity_logs')->insert([
+            'user_id' => Auth::id(),
+            'action' => $action,
+            'details' => $details,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
