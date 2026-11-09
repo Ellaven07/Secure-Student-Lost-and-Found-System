@@ -2,26 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'student_no',
+    'department',
+    'course',
+    'year_level',
+    'profile_photo_path',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -29,4 +31,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Check whether the account is an administrator
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    // Check whether the account is a student
+    public function isStudent(): bool
+    {
+        return $this->role === 'student';
+    }
+
+    // Check whether the account is a viewer
+    public function isViewer(): bool
+    {
+        return $this->role === 'viewer';
+    }
+
+    // Check whether the account is active
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
 }
+?>
