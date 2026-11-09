@@ -1,6 +1,7 @@
 
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StudentAccountController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\AuthController;
@@ -23,8 +24,10 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function () {
-    Route::view('/admin/dashboard', 'admin.dashboard')
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
         ->name('admin.dashboard');
+    Route::get('/admin/dashboard/export', [AdminDashboardController::class, 'export'])
+        ->name('admin.dashboard.export');
 
     Route::get('/admin/students/create', [StudentAccountController::class, 'create'])
         ->name('admin.students.create');
