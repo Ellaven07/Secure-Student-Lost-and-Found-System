@@ -1,10 +1,11 @@
+
 <?php
 
 use App\Http\Controllers\Admin\StudentAccountController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-// Homepage
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -31,7 +32,7 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
         ->middleware('throttle:6,1')
         ->name('admin.students.store');
 
-    Route::view('/admin/students', 'admin.students.index')
+    Route::get('/admin/students', [StudentController::class, 'index'])
         ->name('admin.students.index');
 
     Route::view('/admin/categories', 'admin.categories')

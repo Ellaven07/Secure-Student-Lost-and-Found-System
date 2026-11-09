@@ -91,49 +91,53 @@
                     Main Navigation
                 </p>
 
-                <details class="admin-menu">
+                <details class="admin-menu" id="adminMenu">
 
-                    <summary class="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#28634c]">
+                    <summary class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#28634c]">
 
                         <span class="text-base">⚙</span>
                         <span class="flex-1">Admin</span>
 
-                        <svg class="admin-arrow h-3.5 w-3.5"
-                             fill="none"
-                             stroke="currentColor"
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="m6 9 6 6 6-6"/>
+                        <svg
+                            class="admin-arrow h-3.5 w-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="m6 9 6 6 6-6"
+                            />
                         </svg>
 
                     </summary>
 
                     <div class="mt-1 space-y-1">
 
-                        <a href="{{ route('admin.students.index') }}"
-                           class="submenu-link {{ request()->routeIs('admin.students.index') ? 'active' : '' }}">
-                            <span>👥</span>
+                        <a
+                            href="{{ route('admin.students.index') }}"
+                            class="submenu-link {{ request()->routeIs('admin.students.index') ? 'active' : '' }}"
+                        >
+                            <span>♟</span>
                             <span>Manage Student Accounts</span>
                         </a>
 
-                        <a href="{{ route('student.profile') }}"
-                           class="submenu-link {{ request()->routeIs('student.profile') ? 'active' : '' }}">
-                            <span>👤</span>
+                        <a
+                            href="{{ route('student.profile') }}"
+                            class="submenu-link {{ request()->routeIs('student.profile') ? 'active' : '' }}"
+                        >
+                            <span>♙</span>
                             <span>Student Profile</span>
                         </a>
 
-                        <a href="{{ route('admin.categories') }}"
-                           class="submenu-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}">
-                            <span>🏷</span>
+                        <a
+                            href="{{ route('admin.categories') }}"
+                            class="submenu-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}"
+                        >
+                            <span>▦</span>
                             <span>Manage Categories</span>
-                        </a>
-
-                        <a href="{{ route('student.notifications') }}"
-                           class="submenu-link {{ request()->routeIs('student.notifications') ? 'active' : '' }}">
-                            <span>🔔</span>
-                            <span>Notifications / Alerts</span>
                         </a>
 
                     </div>
@@ -167,7 +171,30 @@
                     </h2>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-4">
+
+                    <a
+                        href="{{ route('student.notifications') }}"
+                        title="View Notifications"
+                        aria-label="View Notifications"
+                        class="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-[#174b38] {{ request()->routeIs('student.notifications') ? 'bg-[#e8eee9] text-[#174b38]' : '' }}"
+                    >
+                        <svg
+                            class="h-6 w-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                                d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0"
+                            />
+                        </svg>
+
+                        <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    </a>
 
                     <div class="hidden text-right sm:block">
                         <p class="text-sm font-semibold text-gray-800">
@@ -191,12 +218,37 @@
             </main>
 
             <footer class="border-t border-gray-200 px-5 py-5 text-center text-xs text-gray-400 sm:px-8">
-                © {{ date('Y') }} Cavite State University Student Lost & Found System. All rights reserved.
+                &copy; {{ date('Y') }} Cavite State University Student Lost & Found System. All rights reserved.
             </footer>
 
         </div>
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const adminMenu = document.getElementById('adminMenu');
+
+            if (!adminMenu) return;
+
+            const storageKey = 'cvsuAdminMenuOpenV2';
+
+            adminMenu.open = sessionStorage.getItem(storageKey) === 'true';
+
+            adminMenu.addEventListener('toggle', function () {
+                sessionStorage.setItem(
+                    storageKey,
+                    adminMenu.open ? 'true' : 'false'
+                );
+            });
+
+            adminMenu.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    sessionStorage.setItem(storageKey, 'true');
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
