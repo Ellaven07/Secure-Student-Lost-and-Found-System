@@ -1,112 +1,159 @@
 
 @extends('layouts.app')
 
-@section('title', 'Manage Student Accounts | Manoa')
+@section('title', 'Manage Student Accounts')
 @section('page-label', 'Student Management')
 
 @section('content')
 
 <style>
+    .student-page {
+        color: #26382e;
+    }
+
     .student-header {
+        margin-bottom: 24px;
+    }
+
+    .student-header h1 {
+        font-size: 23px;
+        font-weight: 800;
+        color: #20392c;
+    }
+
+    .student-header p {
+        margin-top: 5px;
+        color: #849188;
+        font-size: 12px;
+    }
+
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-bottom: 28px;
+        padding: 17px 0;
+        border-top: 1px solid #e4eae5;
+        border-bottom: 1px solid #e4eae5;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 5px 24px;
+    }
+
+    .stat-item:first-child {
+        padding-left: 5px;
+    }
+
+    .stat-item + .stat-item {
+        border-left: 1px solid #dfe6e0;
+    }
+
+    .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #edf3ee;
+        color: #24563d;
+        font-size: 17px;
+    }
+
+    .stat-label {
+        color: #829087;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .stat-number {
+        margin-top: 3px;
+        color: #20392c;
+        font-size: 23px;
+        line-height: 1.2;
+        font-weight: 800;
+    }
+
+    .student-panel {
+        overflow: hidden;
+        background: white;
+        border: 1px solid #e5ebe6;
+        border-radius: 9px;
+    }
+
+    .panel-heading {
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 15px;
-        margin-bottom: 27px;
+        flex-wrap: wrap;
+        padding: 19px 22px;
+        border-bottom: 1px solid #edf0ed;
+    }
+
+    .panel-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #263b2e;
+    }
+
+    .panel-subtitle {
+        margin-top: 4px;
+        font-size: 11px;
+        color: #8a968e;
+    }
+
+    .student-controls {
+        display: flex;
+        gap: 9px;
         flex-wrap: wrap;
     }
 
-    .add-student-btn {
+    .search-input,
+    .status-filter {
+        height: 37px;
+        padding: 0 11px;
+        border: 1px solid #dfe7e0;
+        border-radius: 6px;
+        outline: none;
+        background: white;
+        color: #34463a;
+        font-family: inherit;
+        font-size: 11px;
+    }
+
+    .search-input {
+        width: 220px;
+    }
+
+    .search-input:focus,
+    .status-filter:focus {
+        border-color: #397b5b;
+    }
+
+    .search-button {
+        height: 37px;
+        padding: 0 15px;
+        border: none;
+        border-radius: 6px;
         background: #174b38;
         color: white;
-        border: none;
-        padding: 12px 19px;
-        border-radius: 8px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         cursor: pointer;
     }
 
-    .add-student-btn:hover { background: #286349; }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 17px;
-        margin-bottom: 25px;
+    .search-button:hover {
+        background: #28634c;
     }
 
-    .stat-card {
-        background: white;
-        border: 1px solid #e9eee9;
-        border-radius: 12px;
-        padding: 21px;
+    .table-wrapper {
+        overflow-x: auto;
     }
-
-    .stat-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .stat-label { font-size: 12px; color: #849188; font-weight: 600; }
-    .stat-number { font-size: 28px; font-weight: 800; color: #24352d; }
-    .stat-icon {
-        width: 39px;
-        height: 39px;
-        display: grid;
-        place-items: center;
-        border-radius: 10px;
-        font-size: 17px;
-    }
-
-    .green-icon { background: #e7f2e9; color: #246344; }
-    .blue-icon { background: #e8f1f8; color: #397ba5; }
-    .gold-icon { background: #faf2df; color: #b18a32; }
-
-    .student-panel {
-        background: white;
-        border: 1px solid #e9eee9;
-        border-radius: 13px;
-        overflow: hidden;
-    }
-
-    .panel-heading {
-        padding: 23px 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-        flex-wrap: wrap;
-        border-bottom: 1px solid #edf0ed;
-    }
-
-    .panel-title { font-size: 15px; font-weight: 800; }
-    .panel-subtitle { font-size: 11px; color: #89958d; margin-top: 5px; }
-
-    .student-controls {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .search-input, .status-filter {
-        height: 39px;
-        border: 1px solid #e1e8e1;
-        border-radius: 7px;
-        padding: 0 12px;
-        font-family: inherit;
-        font-size: 11px;
-        outline: none;
-        background: white;
-        color: #34463a;
-    }
-
-    .search-input { width: 220px; }
-    .search-input:focus, .status-filter:focus { border-color: #397b5b; }
-
-    .table-wrapper { overflow-x: auto; }
 
     .student-table {
         width: 100%;
@@ -116,36 +163,24 @@
     }
 
     .student-table th {
-        padding: 14px 20px;
+        padding: 13px 19px;
         background: #f8faf8;
-        color: #89958d;
+        color: #849188;
         font-size: 10px;
         font-weight: 800;
-        letter-spacing: .6px;
+        letter-spacing: .5px;
         text-transform: uppercase;
     }
 
     .student-table td {
-        padding: 16px 20px;
+        padding: 14px 19px;
         border-bottom: 1px solid #eff2ef;
-        font-size: 11px;
         color: #526157;
+        font-size: 11px;
     }
 
-    .student-table tbody tr:hover { background: #fbfdfb; }
-    .student-name { font-weight: 700; color: #293b30; }
-    .student-email { font-size: 10px; color: #98a29a; margin-top: 4px; }
-
-    .student-avatar {
-        width: 34px;
-        height: 34px;
-        display: grid;
-        place-items: center;
-        border-radius: 50%;
-        background: #e7efe7;
-        color: #20533a;
-        font-weight: 800;
-        font-size: 11px;
+    .student-table tbody tr:hover {
+        background: #fbfdfb;
     }
 
     .student-person {
@@ -154,294 +189,303 @@
         gap: 10px;
     }
 
+    .student-avatar {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #e7efe7;
+        color: #20533a;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .student-name {
+        color: #293b30;
+        font-weight: 700;
+    }
+
+    .student-email {
+        margin-top: 3px;
+        color: #98a29a;
+        font-size: 10px;
+    }
+
     .status-badge {
         display: inline-block;
-        padding: 6px 10px;
+        padding: 5px 9px;
         border-radius: 20px;
         font-size: 10px;
         font-weight: 700;
+        text-transform: capitalize;
     }
 
-    .active-status { background: #e5f3e9; color: #267246; }
-    .inactive-status { background: #f0f1f0; color: #737d75; }
-
-    .action-btn {
-        border: none;
-        background: transparent;
-        color: #397ba5;
-        font-weight: 700;
-        font-size: 11px;
-        cursor: pointer;
-        margin-right: 9px;
+    .active-status {
+        background: #e5f3e9;
+        color: #267246;
     }
 
-    .action-btn.edit { color: #b18a32; }
-
-    .table-footer {
-        padding: 17px 22px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: #89958d;
-        font-size: 11px;
+    .inactive-status {
+        background: #f0f1f0;
+        color: #737d75;
     }
 
     .empty-state {
-        text-align: center;
-        padding: 35px;
+        padding: 35px 20px;
         color: #89958d;
-        display: none;
+        text-align: center;
         font-size: 12px;
     }
 
-    @media(max-width: 850px) {
-        .stats-grid { grid-template-columns: 1fr; }
-        .search-input { width: 170px; }
+    .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 15px 20px;
+        color: #89958d;
+        font-size: 11px;
+    }
+
+    .pagination-wrapper nav {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .pagination-wrapper nav div:first-child {
+        display: none;
+    }
+
+    .pagination-wrapper nav div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .pagination-wrapper nav a,
+    .pagination-wrapper nav span[aria-current="page"] span,
+    .pagination-wrapper nav span[aria-disabled="true"] span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 29px;
+        height: 29px;
+        padding: 0 8px;
+        border: 1px solid #e3e9e4;
+        border-radius: 5px;
+        color: #526157;
+        font-size: 11px;
+        text-decoration: none;
+    }
+
+    .pagination-wrapper nav span[aria-current="page"] span {
+        background: #174b38;
+        border-color: #174b38;
+        color: white;
+    }
+
+    @media (max-width: 700px) {
+        .stats-section {
+            grid-template-columns: 1fr;
+            gap: 13px;
+        }
+
+        .stat-item,
+        .stat-item:first-child {
+            padding: 5px 3px;
+        }
+
+        .stat-item + .stat-item {
+            padding-top: 14px;
+            border-top: 1px solid #e4eae5;
+            border-left: none;
+        }
+
+        .panel-heading {
+            align-items: flex-start;
+        }
+
+        .student-controls {
+            width: 100%;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 120px;
+        }
     }
 </style>
 
-<div class="student-header">
-    <div>
+<div class="student-page">
+
+    <div class="student-header">
         <h1 class="page-heading">Manage Student Accounts</h1>
         <p class="page-description">
-            View, manage, and monitor registered student accounts.
+            View and monitor registered student accounts.
         </p>
     </div>
 
-    <button class="add-student-btn" type="button">
-        + Add Student
-    </button>
-</div>
+    <section class="stats-section">
 
-<div class="stats-grid">
-
-    <div class="stat-card">
-        <div class="stat-top">
-            <span class="stat-label">Total Students</span>
-            <span class="stat-icon green-icon">♙</span>
-        </div>
-        <div class="stat-number" id="totalCount">6</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-top">
-            <span class="stat-label">Active Accounts</span>
-            <span class="stat-icon blue-icon">✓</span>
-        </div>
-        <div class="stat-number" id="activeCount">4</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-top">
-            <span class="stat-label">Inactive Accounts</span>
-            <span class="stat-icon gold-icon">◷</span>
-        </div>
-        <div class="stat-number" id="inactiveCount">2</div>
-    </div>
-
-</div>
-
-<div class="student-panel">
-
-    <div class="panel-heading">
-        <div>
-            <div class="panel-title">Student Directory</div>
-            <div class="panel-subtitle">Registered student account information</div>
+        <div class="stat-item">
+            <div class="stat-icon">♙</div>
+            <div>
+                <div class="stat-label">Total Students</div>
+                <div class="stat-number">{{ number_format($totalStudents) }}</div>
+            </div>
         </div>
 
-        <div class="student-controls">
-            <input
-                type="text"
-                id="studentSearch"
-                class="search-input"
-                placeholder="Search student..."
-            >
-
-            <select id="statusFilter" class="status-filter">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
+        <div class="stat-item">
+            <div class="stat-icon">✓</div>
+            <div>
+                <div class="stat-label">Active Accounts</div>
+                <div class="stat-number">{{ number_format($activeStudents) }}</div>
+            </div>
         </div>
-    </div>
 
-    <div class="table-wrapper">
-        <table class="student-table">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Student ID</th>
-                    <th>Course</th>
-                    <th>Year Level</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+        <div class="stat-item">
+            <div class="stat-icon">◷</div>
+            <div>
+                <div class="stat-label">Inactive Accounts</div>
+                <div class="stat-number">{{ number_format($inactiveStudents) }}</div>
+            </div>
+        </div>
 
-            <tbody id="studentTable">
+    </section>
 
-                <tr data-status="active">
-                    <td>
-                        <div class="student-person">
-                            <div class="student-avatar">JD</div>
-                            <div>
-                                <div class="student-name">Juan Dela Cruz</div>
-                                <div class="student-email">juan@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>2024-00125</td>
-                    <td>BS Information Technology</td>
-                    <td>3rd Year</td>
-                    <td><span class="status-badge active-status">Active</span></td>
-                    <td>
-                        <button class="action-btn" type="button">View</button>
-                        <button class="action-btn edit" type="button">Edit</button>
-                    </td>
-                </tr>
+    <section class="student-panel">
 
-                <tr data-status="active">
-                    <td>
-                        <div class="student-person">
-                            <div class="student-avatar">MS</div>
-                            <div>
-                                <div class="student-name">Maria Santos</div>
-                                <div class="student-email">maria@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>2024-00126</td>
-                    <td>BS Computer Science</td>
-                    <td>2nd Year</td>
-                    <td><span class="status-badge active-status">Active</span></td>
-                    <td>
-                        <button class="action-btn" type="button">View</button>
-                        <button class="action-btn edit" type="button">Edit</button>
-                    </td>
-                </tr>
+        <div class="panel-heading">
+            <div>
+                <div class="panel-title">Student Directory</div>
+                <div class="panel-subtitle">
+                    Registered student account information
+                </div>
+            </div>
 
-                <tr data-status="inactive">
-                    <td>
-                        <div class="student-person">
-                            <div class="student-avatar">AR</div>
-                            <div>
-                                <div class="student-name">Angela Reyes</div>
-                                <div class="student-email">angela@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>2023-00451</td>
-                    <td>BS Information Technology</td>
-                    <td>4th Year</td>
-                    <td><span class="status-badge inactive-status">Inactive</span></td>
-                    <td>
-                        <button class="action-btn" type="button">View</button>
-                        <button class="action-btn edit" type="button">Edit</button>
-                    </td>
-                </tr>
+            <form method="GET"
+                  action="{{ route('admin.students.index') }}"
+                  class="student-controls">
 
-                <tr data-status="active">
-                    <td>
-                        <div class="student-person">
-                            <div class="student-avatar">CM</div>
-                            <div>
-                                <div class="student-name">Carlos Mendoza</div>
-                                <div class="student-email">carlos@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>2024-00210</td>
-                    <td>BS Information Systems</td>
-                    <td>2nd Year</td>
-                    <td><span class="status-badge active-status">Active</span></td>
-                    <td>
-                        <button class="action-btn" type="button">View</button>
-                        <button class="action-btn edit" type="button">Edit</button>
-                    </td>
-                </tr>
+                <input
+                    type="text"
+                    name="search"
+                    class="search-input"
+                    placeholder="Search student..."
+                    value="{{ request('search') }}"
+                >
 
-                <tr data-status="inactive">
-                    <td>
-                        <div class="student-person">
-                            <div class="student-avatar">SL</div>
-                            <div>
-                                <div class="student-name">Sofia Lopez</div>
-                                <div class="student-email">sofia@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>2023-00315</td>
-                    <td>BS Computer Science</td>
-                    <td>3rd Year</td>
-                    <td><span class="status-badge inactive-status">Inactive</span></td>
-                    <td>
-                        <button class="action-btn" type="button">View</button>
-                        <button class="action-btn edit" type="button">Edit</button>
-                    </td>
-                </tr>
+                <select
+                    name="status"
+                    class="status-filter"
+                    onchange="this.form.submit()">
 
-                <tr data-status="active">
-                    <td>
-                        <div class="student-person">
-                            <div class="student-avatar">MR</div>
-                            <div>
-                                <div class="student-name">Miguel Ramos</div>
-                                <div class="student-email">miguel@example.com</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>2024-00198</td>
-                    <td>BS Information Technology</td>
-                    <td>1st Year</td>
-                    <td><span class="status-badge active-status">Active</span></td>
-                    <td>
-                        <button class="action-btn" type="button">View</button>
-                        <button class="action-btn edit" type="button">Edit</button>
-                    </td>
-                </tr>
+                    <option value="">All Status</option>
+                    <option value="active" @selected(request('status') === 'active')>
+                        Active
+                    </option>
+                    <option value="inactive" @selected(request('status') === 'inactive')>
+                        Inactive
+                    </option>
 
-            </tbody>
-        </table>
-    </div>
+                </select>
 
-    <div class="empty-state" id="emptyState">
-        No students found matching your search.
-    </div>
+                <button type="submit" class="search-button">
+                    Search
+                </button>
 
-    <div class="table-footer">
-        <span>Showing <strong id="visibleCount">6</strong> sample student records</span>
-        <span>Student Directory</span>
-    </div>
+            </form>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="student-table">
+
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Student ID</th>
+                        <th>Course</th>
+                        <th>Year Level</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse ($students as $student)
+
+                        <tr>
+                            <td>
+                                <div class="student-person">
+
+                                    <div class="student-avatar">
+                                        {{ strtoupper(substr($student->name ?? 'S', 0, 1)) }}
+                                    </div>
+
+                                    <div>
+                                        <div class="student-name">
+                                            {{ $student->name }}
+                                        </div>
+
+                                        <div class="student-email">
+                                            {{ $student->email }}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </td>
+
+                            <td>{{ $student->student_no ?: '—' }}</td>
+
+                            <td>{{ $student->course ?: '—' }}</td>
+
+                            <td>{{ $student->year_level ?: '—' }}</td>
+
+                            <td>
+                                @if ($student->status === 'active')
+                                    <span class="status-badge active-status">
+                                        Active
+                                    </span>
+                                @else
+                                    <span class="status-badge inactive-status">
+                                        {{ $student->status ?: 'Inactive' }}
+                                    </span>
+                                @endif
+                            </td>
+                        </tr>
+
+                    @empty
+
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    No student records found.
+                                </div>
+                            </td>
+                        </tr>
+
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <span>
+                Showing {{ $students->firstItem() ?? 0 }}
+                to {{ $students->lastItem() ?? 0 }}
+                of {{ $students->total() }} student records
+            </span>
+
+            <div class="pagination-wrapper">
+                {{ $students->links() }}
+            </div>
+        </div>
+
+    </section>
 
 </div>
-
-<script>
-    const searchInput = document.getElementById('studentSearch');
-    const statusFilter = document.getElementById('statusFilter');
-    const rows = document.querySelectorAll('#studentTable tr');
-
-    function filterStudents() {
-        const search = searchInput.value.toLowerCase();
-        const status = statusFilter.value;
-        let visible = 0;
-
-        rows.forEach(row => {
-            const matchesSearch = row.textContent.toLowerCase().includes(search);
-            const matchesStatus = status === 'all' || row.dataset.status === status;
-
-            const show = matchesSearch && matchesStatus;
-            row.style.display = show ? '' : 'none';
-
-            if (show) visible++;
-        });
-
-        document.getElementById('visibleCount').textContent = visible;
-        document.getElementById('emptyState').style.display =
-            visible === 0 ? 'block' : 'none';
-    }
-
-    searchInput.addEventListener('input', filterStudents);
-    statusFilter.addEventListener('change', filterStudents);
-</script>
 
 @endsection
