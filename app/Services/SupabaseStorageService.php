@@ -45,7 +45,7 @@ class SupabaseStorageService
                 ->withHeaders([
                     'Content-Type' => $photo->getMimeType() ?: 'application/octet-stream',
                     'x-upsert' => 'false',
-                    'cache-control' => '3600',
+                    'cache-control' => 'max-age=3600',
                 ])
                 ->withBody($photo->getContent(), $photo->getMimeType() ?: 'application/octet-stream')
                 ->post($this->objectUrl($objectPath));
@@ -58,6 +58,9 @@ class SupabaseStorageService
         if (! $response->successful()) {
             Log::warning('Supabase profile photo upload failed.', [
                 'status' => $response->status(),
+                'error' => $response->json('message')
+                    ?? $response->json('error')
+                    ?? 'Supabase did not return an error message.',
             ]);
 
             return null;
