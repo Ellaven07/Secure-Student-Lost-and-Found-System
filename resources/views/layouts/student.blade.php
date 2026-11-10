@@ -31,7 +31,6 @@
                 <div class="space-y-1">
                     <a href="{{ route('student.dashboard') }}" class="portal-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}"><span aria-hidden="true">⌂</span><span>Dashboard</span></a>
                     <a href="{{ route('student.profile') }}" class="portal-link {{ request()->routeIs('student.profile') ? 'active' : '' }}"><span aria-hidden="true">♙</span><span>My Profile</span></a>
-                    <a href="{{ route('student.notifications') }}" class="portal-link {{ request()->routeIs('student.notifications') ? 'active' : '' }}"><span aria-hidden="true">♢</span><span>Notifications</span></a>
                 </div>
             </nav>
             <div class="border-t border-white/10 px-5 py-4">

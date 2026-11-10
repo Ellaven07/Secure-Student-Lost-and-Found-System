@@ -1,5 +1,5 @@
 
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('title', 'Manage Categories')
 @section('page-label', 'Manage Categories')

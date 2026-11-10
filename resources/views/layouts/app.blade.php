@@ -91,7 +91,7 @@
                     Main Navigation
                 </p>
 
-                <details class="admin-menu" id="adminMenu">
+                <details class="admin-menu" id="adminMenu" data-force-open="{{ request()->routeIs('admin.dashboard', 'admin.students.*', 'admin.categories', 'admin.notifications') ? 'true' : 'false' }}" {{ request()->routeIs('admin.dashboard', 'admin.students.*', 'admin.categories', 'admin.notifications') ? 'open' : '' }}>
 
                     <summary class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#28634c]">
 
@@ -117,11 +117,11 @@
                     <div class="mt-1 space-y-1">
 
                         <a
-                            href="{{ route('admin.notifications') }}"
-                            class="submenu-link {{ request()->routeIs('admin.notifications') ? 'active' : '' }}"
+                            href="{{ route('admin.dashboard') }}"
+                            class="submenu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                         >
                             <span>♢</span>
-                            <span>Notifications</span>
+                            <span>Dashboard</span>
                         </a>
 
                         <a
@@ -236,7 +236,9 @@
 
             const storageKey = 'cvsuAdminMenuOpenV2';
 
-            adminMenu.open = sessionStorage.getItem(storageKey) === 'true';
+            adminMenu.open = adminMenu.dataset.forceOpen === 'true'
+                || adminMenu.querySelector('.submenu-link.active') !== null
+                || sessionStorage.getItem(storageKey) === 'true';
 
             adminMenu.addEventListener('toggle', function () {
                 sessionStorage.setItem(

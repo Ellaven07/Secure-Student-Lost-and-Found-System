@@ -1,5 +1,5 @@
 
-@extends(auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.student')
+@extends(auth()->user()->isAdmin() ? 'layouts.app' : 'layouts.student')
 
 @section('title', auth()->user()->isAdmin() ? 'Admin Notifications' : 'Notifications')
 @section('page-label', 'Notifications')
