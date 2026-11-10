@@ -183,16 +183,23 @@
 
                     <div class="hidden h-8 w-px bg-gray-200 sm:block"></div>
 
-                    <div class="hidden text-right sm:block">
-                        <p class="text-xs font-semibold text-gray-700">
-                            {{ auth()->user()->name }}
-                        </p>
-                        <p class="text-[10px] text-gray-400">Student</p>
-                    </div>
+                    <a
+                        href="{{ route('student.profile') }}"
+                        aria-label="Open your student profile"
+                        title="My Profile"
+                        class="group flex items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#28634c] focus:ring-offset-2"
+                    >
+                        <div class="hidden text-right sm:block">
+                            <p class="text-xs font-semibold text-gray-700 group-hover:text-[#174b38]">
+                                {{ auth()->user()->name }}
+                            </p>
+                            <p class="text-[10px] text-gray-400">My Profile</p>
+                        </div>
 
-                    <div class="grid h-9 w-9 place-items-center rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38]">
-                        {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
-                    </div>
+                        <div class="grid h-9 w-9 place-items-center rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38] transition group-hover:bg-[#dce9df]">
+                            {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                        </div>
+                    </a>
                 </div>
             </header>
 
