@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -16,7 +15,7 @@ class StudentProfileController extends Controller
     /**
      * Display the authenticated student's profile.
      */
-    public function show(): View
+    public function show(SupabaseStorageService $photoStorage): View
     {
         $student = auth()->user();
 
@@ -39,6 +38,7 @@ class StudentProfileController extends Controller
         return view('student.profile', [
             'student' => $student,
             'statistics' => $statistics,
+            'profilePhotoUrl' => $photoStorage->url($student->profile_photo_path),
         ]);
     }
 
@@ -56,13 +56,13 @@ class StudentProfileController extends Controller
                 'string',
                 'email',
                 'max:255',
-                'unique:users,email,' . $student->id,
+                'unique:users,email,'.$student->id,
             ],
             'student_no' => [
                 'nullable',
                 'string',
                 'max:255',
-                'unique:users,student_no,' . $student->id,
+                'unique:users,student_no,'.$student->id,
             ],
             'department' => ['nullable', 'string', 'max:255'],
             'course' => ['nullable', 'string', 'max:255'],
@@ -79,7 +79,7 @@ class StudentProfileController extends Controller
     /**
      * Upload or replace the student's profile photo.
      */
-    public function updatePhoto(Request $request): RedirectResponse
+    public function updatePhoto(Request $request, SupabaseStorageService $photoStorage): RedirectResponse
     {
         $request->validate([
             'profile_photo' => [
@@ -92,8 +92,13 @@ class StudentProfileController extends Controller
 
         $student = $request->user();
 
-        $newPhotoPath = $request->file('profile_photo')
-            ->store('student-profiles', 'public');
+        if (! $photoStorage->isConfigured()) {
+            return redirect()
+                ->route('student.profile')
+                ->with('error', 'Shared photo storage is not configured yet. Ask the administrator to connect Supabase Storage.');
+        }
+
+        $newPhotoPath = $photoStorage->upload($request->file('profile_photo'), $student->id);
 
         if (! $newPhotoPath) {
             return redirect()
@@ -107,9 +112,7 @@ class StudentProfileController extends Controller
             'profile_photo_path' => $newPhotoPath,
         ]);
 
-        if ($oldPhotoPath) {
-            Storage::disk('public')->delete($oldPhotoPath);
-        }
+        $photoStorage->delete($oldPhotoPath);
 
         return redirect()
             ->route('student.profile')

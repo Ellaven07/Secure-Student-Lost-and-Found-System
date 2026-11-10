@@ -29,8 +29,8 @@
         <div class="bg-[#174b38] px-6 py-7 text-white sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center gap-5">
 
-                @if ($student->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($student->profile_photo_path))
-                    <img src="{{ asset('storage/'.$student->profile_photo_path) }}"
+                @if ($profilePhotoUrl)
+                    <img src="{{ $profilePhotoUrl }}"
                          alt="Student profile photo"
                          class="h-20 w-20 rounded-full border-4 border-white/30 object-cover">
                 @else

@@ -108,9 +108,9 @@
             <div class="md:col-span-2">
                 <label class="mb-2 block text-sm font-semibold text-gray-700">Profile Photo</label>
 
-                @if ($student->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($student->profile_photo_path))
+                @if ($profilePhotoUrl)
                     <div class="mb-3 flex items-center gap-4">
-                        <img src="{{ asset('storage/'.$student->profile_photo_path) }}"
+                        <img src="{{ $profilePhotoUrl }}"
                              alt="Current profile photo"
                              class="h-16 w-16 rounded-full border border-gray-200 object-cover">
                         <p class="text-xs text-gray-500">Current profile photo</p>

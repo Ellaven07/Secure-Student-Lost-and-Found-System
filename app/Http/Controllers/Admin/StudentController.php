@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -133,21 +133,27 @@ class StudentController extends Controller
                 : 'Student account created as inactive. Activate it before the student can sign in.');
     }
 
-    public function show(User $student)
+    public function show(User $student, SupabaseStorageService $photoStorage)
     {
         $this->ensureStudent($student);
 
-        return view('admin.students.show', compact('student'));
+        return view('admin.students.show', [
+            'student' => $student,
+            'profilePhotoUrl' => $photoStorage->url($student->profile_photo_path),
+        ]);
     }
 
-    public function edit(User $student)
+    public function edit(User $student, SupabaseStorageService $photoStorage)
     {
         $this->ensureStudent($student);
 
-        return view('admin.students.edit', compact('student'));
+        return view('admin.students.edit', [
+            'student' => $student,
+            'profilePhotoUrl' => $photoStorage->url($student->profile_photo_path),
+        ]);
     }
 
-    public function update(Request $request, User $student)
+    public function update(Request $request, User $student, SupabaseStorageService $photoStorage)
     {
         $this->ensureStudent($student);
 
@@ -169,22 +175,37 @@ class StudentController extends Controller
             'course' => ['nullable', 'string', 'max:255'],
             'year_level' => ['nullable', 'string', 'max:50'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
-            'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($request->hasFile('profile_photo')) {
-            if ($student->profile_photo_path) {
-                Storage::disk('public')->delete($student->profile_photo_path);
+            if (! $photoStorage->isConfigured()) {
+                return back()
+                    ->withErrors(['profile_photo' => 'Shared photo storage is not configured yet. Ask the administrator to connect Supabase Storage.'])
+                    ->withInput();
             }
 
-            $validated['profile_photo_path'] = $request
-                ->file('profile_photo')
-                ->store('student-profiles', 'public');
+            $newPhotoPath = $photoStorage->upload($request->file('profile_photo'), $student->id);
+
+            if (! $newPhotoPath) {
+                return back()
+                    ->withErrors(['profile_photo' => 'The photo could not be uploaded to shared storage. Please try again.'])
+                    ->withInput();
+            }
+
+            $oldPhotoPath = $student->profile_photo_path;
+            $validated['profile_photo_path'] = $newPhotoPath;
+        } else {
+            $oldPhotoPath = null;
         }
 
         unset($validated['profile_photo']);
 
         $student->update($validated);
+
+        if ($oldPhotoPath) {
+            $photoStorage->delete($oldPhotoPath);
+        }
 
         $this->createNotification(
             $student->id,
@@ -203,12 +224,13 @@ class StudentController extends Controller
             ->with('success', 'Student account updated successfully.');
     }
 
-    public function destroy(User $student): RedirectResponse
+    public function destroy(User $student, SupabaseStorageService $photoStorage): RedirectResponse
     {
         $this->ensureStudent($student);
 
         $studentName = $student->name;
         $studentEmail = $student->email;
+        $profilePhotoPath = $student->profile_photo_path;
 
         $deleted = DB::transaction(function () use ($student, $studentEmail): bool {
             $hasReports = DB::table('items')
@@ -238,6 +260,8 @@ class StudentController extends Controller
         if (! $deleted) {
             return back()->with('error', 'This account cannot be deleted because it has submitted reports or claim requests.');
         }
+
+        $photoStorage->delete($profilePhotoPath);
 
         $this->logActivity(
             'Deleted student account',

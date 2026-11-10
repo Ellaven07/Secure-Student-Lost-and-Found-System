@@ -12,10 +12,6 @@
         ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
         ->implode('');
 
-    $profilePhotoUrl = $student->profile_photo_path
-        && \Illuminate\Support\Facades\Storage::disk('public')->exists($student->profile_photo_path)
-        ? \Illuminate\Support\Facades\Storage::disk('public')->url($student->profile_photo_path)
-        : null;
     $isActive = ($student->status ?? 'active') === 'active';
 @endphp
 
