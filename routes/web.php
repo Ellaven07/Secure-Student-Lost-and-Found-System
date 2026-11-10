@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
@@ -54,12 +53,9 @@ Route::middleware(['auth', 'role:admin,student', 'frontend-preview'])->group(fun
 // Admin Routes
 Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function () {
 
-    // Admin Dashboard
-    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    // Redirect old dashboard bookmarks to FACF Student Management.
+    Route::redirect('/admin/dashboard', '/admin/students')
         ->name('admin.dashboard');
-
-    Route::get('/admin/dashboard/export', [AdminDashboardController::class, 'export'])
-        ->name('admin.dashboard.export');
 
     Route::get('/admin/notifications', [NotificationController::class, 'index'])
         ->name('admin.notifications');

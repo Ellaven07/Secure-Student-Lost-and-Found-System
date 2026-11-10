@@ -91,7 +91,7 @@
                     Main Navigation
                 </p>
 
-                <details class="admin-menu" id="adminMenu" data-force-open="{{ request()->routeIs('admin.dashboard', 'admin.students.*', 'admin.categories', 'admin.notifications') ? 'true' : 'false' }}" {{ request()->routeIs('admin.dashboard', 'admin.students.*', 'admin.categories', 'admin.notifications') ? 'open' : '' }}>
+                <details class="admin-menu" id="adminMenu" data-force-open="{{ request()->routeIs('admin.students.*', 'admin.categories', 'admin.notifications') ? 'true' : 'false' }}" {{ request()->routeIs('admin.students.*', 'admin.categories', 'admin.notifications') ? 'open' : '' }}>
 
                     <summary class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#28634c]">
 
@@ -115,14 +115,6 @@
                     </summary>
 
                     <div class="mt-1 space-y-1">
-
-                        <a
-                            href="{{ route('admin.dashboard') }}"
-                            class="submenu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                        >
-                            <span>♢</span>
-                            <span>Dashboard</span>
-                        </a>
 
                         <a
                             href="{{ route('admin.students.index') }}"

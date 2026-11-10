@@ -29,7 +29,6 @@
             <nav class="flex-1 px-4 py-5">
                 <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Administration</p>
                 <div class="space-y-1">
-                    <a href="{{ route('admin.dashboard') }}" class="portal-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><span aria-hidden="true">⌂</span><span>Dashboard</span></a>
                     <a href="{{ route('admin.students.index') }}" class="portal-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}"><span aria-hidden="true">♙</span><span>Manage Student Accounts</span></a>
                     <a href="{{ route('admin.categories') }}" class="portal-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}"><span aria-hidden="true">▦</span><span>Manage Categories</span></a>
                 </div>
