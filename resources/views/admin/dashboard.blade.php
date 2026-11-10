@@ -23,6 +23,21 @@
         <a href="{{ route('admin.dashboard.export') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Generate Reports</a>
     </nav>
 
+    <section aria-label="Admin page placeholders" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <article id="claim-requests-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+            <h2 class="text-base font-bold text-gray-800">Claim Requests</h2>
+        </article>
+        <article id="all-reports-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+            <h2 class="text-base font-bold text-gray-800">All Reports</h2>
+        </article>
+        <article id="activity-logs-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+            <h2 class="text-base font-bold text-gray-800">Activity Logs</h2>
+        </article>
+        <article id="generate-print-reports-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+            <h2 class="text-base font-bold text-gray-800">Generate and Print Reports</h2>
+        </article>
+    </section>
+
     <section id="report-charts" class="scroll-mt-24 space-y-4">
         <div>
             <h2 class="text-lg font-bold text-gray-800">Reports and claims</h2>

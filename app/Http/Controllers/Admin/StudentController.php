@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -127,7 +128,9 @@ class StudentController extends Controller
 
         return redirect()
             ->route('admin.students.index')
-            ->with('success', 'Student account created successfully.');
+            ->with('success', $student->isActive()
+                ? 'Student account created. The student can sign in with the email and password you entered.'
+                : 'Student account created as inactive. Activate it before the student can sign in.');
     }
 
     public function show(User $student)
@@ -198,6 +201,52 @@ class StudentController extends Controller
         return redirect()
             ->route('admin.students.show', $student)
             ->with('success', 'Student account updated successfully.');
+    }
+
+    public function destroy(User $student): RedirectResponse
+    {
+        $this->ensureStudent($student);
+
+        $studentName = $student->name;
+        $studentEmail = $student->email;
+
+        $deleted = DB::transaction(function () use ($student, $studentEmail): bool {
+            $hasReports = DB::table('items')
+                ->where('user_id', $student->id)
+                ->exists();
+            $hasClaims = DB::table('claims')
+                ->where('claimant_id', $student->id)
+                ->exists();
+
+            if ($hasReports || $hasClaims) {
+                return false;
+            }
+
+            DB::table('sessions')
+                ->where('user_id', $student->id)
+                ->delete();
+
+            DB::table('password_reset_tokens')
+                ->where('email', $studentEmail)
+                ->delete();
+
+            $student->delete();
+
+            return true;
+        });
+
+        if (! $deleted) {
+            return back()->with('error', 'This account cannot be deleted because it has submitted reports or claim requests.');
+        }
+
+        $this->logActivity(
+            'Deleted student account',
+            'Deleted student account for '.$studentName.'.'
+        );
+
+        return redirect()
+            ->route('admin.students.index')
+            ->with('success', 'Student account deleted successfully.');
     }
 
     public function toggleStatus(User $student)

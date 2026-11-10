@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Student\StudentProfileController;
 use App\Http\Controllers\AuthController;
@@ -91,6 +91,10 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
         ->whereNumber('student')
         ->name('admin.students.update');
 
+    Route::delete('/admin/students/{student}', [StudentController::class, 'destroy'])
+        ->whereNumber('student')
+        ->name('admin.students.destroy');
+
     Route::patch('/admin/students/{student}/status', [StudentController::class, 'toggleStatus'])
         ->whereNumber('student')
         ->name('admin.students.status');
@@ -100,19 +104,19 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
         ->name('admin.students.password');
 
     // Manage Categories
-Route::get('/admin/categories', [CategoryController::class, 'index'])
-    ->name('admin.categories');
+    Route::get('/admin/categories', [CategoryController::class, 'index'])
+        ->name('admin.categories');
 
-Route::post('/admin/categories', [CategoryController::class, 'store'])
-    ->name('admin.categories.store');
+    Route::post('/admin/categories', [CategoryController::class, 'store'])
+        ->name('admin.categories.store');
 
-Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])
-    ->whereNumber('category')
-    ->name('admin.categories.update');
+    Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])
+        ->whereNumber('category')
+        ->name('admin.categories.update');
 
-Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])
-    ->whereNumber('category')
-    ->name('admin.categories.destroy');
+    Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])
+        ->whereNumber('category')
+        ->name('admin.categories.destroy');
 });
 
 // Student Routes

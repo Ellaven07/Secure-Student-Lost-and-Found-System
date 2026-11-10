@@ -20,12 +20,25 @@
         }
 
         .admin-menu summary {
-            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border-radius: 9px;
+            color: white;
             cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            list-style: none;
+            transition: background .15s ease;
         }
 
         .admin-menu summary::-webkit-details-marker {
             display: none;
+        }
+
+        .admin-menu summary:hover {
+            background: #28634c;
         }
 
         .admin-menu[open] .admin-arrow {
@@ -33,18 +46,26 @@
         }
 
         .admin-arrow {
-            transition: transform .2s ease;
+            transition: transform .15s ease;
         }
 
         .submenu-link {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 10px 8px 32px;
-            border-radius: 7px;
+            padding: 9px 12px 9px 32px;
+            border-radius: 8px;
             color: #cbdad2;
             font-size: 12px;
-            transition: all .2s ease;
+            font-weight: 600;
+            transition: background .15s ease, color .15s ease;
+        }
+
+        .submenu-link svg {
+            width: 16px;
+            height: 16px;
+            flex: none;
+            opacity: .85;
         }
 
         .submenu-link:hover,
@@ -56,6 +77,7 @@
         .submenu-link.active {
             box-shadow: inset 3px 0 0 #d7b65d;
         }
+
     </style>
 </head>
 
@@ -63,98 +85,58 @@
 
     <div class="min-h-screen md:flex">
 
-        <aside class="w-full bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
-
-            <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">
-                    CvSU
+        <aside class="w-full overflow-y-auto bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
+            <div class="flex items-center gap-3 border-b border-white/10 px-5 py-6">
+                <div class="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">CvSU</div>
+                <div class="min-w-0">
+                    <h1 class="truncate text-xs font-extrabold tracking-[.08em]">CAVITE STATE UNIVERSITY</h1>
+                    <p class="mt-1 text-xs text-green-100">Student Lost &amp; Found</p>
+                    <p class="text-[10px] text-green-200/70">Administrator Portal</p>
                 </div>
-
-                <div>
-                    <h1 class="text-sm font-extrabold tracking-wide">
-                        CAVITE STATE UNIVERSITY
-                    </h1>
-                    <p class="mt-1 text-xs text-green-100">
-                        Student Lost & Found
-                    </p>
-                    <p class="text-[10px] text-green-200/70">
-                        Management System
-                    </p>
-                </div>
-
             </div>
 
-            <nav class="flex-1 px-4 py-5">
+            <nav aria-label="Admin navigation" class="flex-1 px-4 py-5">
+                <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Main Navigation</p>
 
-                <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">
-                    Main Navigation
-                </p>
-
-                <details class="admin-menu" id="adminMenu" data-force-open="{{ request()->routeIs('admin.dashboard', 'admin.students.*', 'admin.categories', 'admin.notifications') ? 'true' : 'false' }}" {{ request()->routeIs('admin.dashboard', 'admin.students.*', 'admin.categories', 'admin.notifications') ? 'open' : '' }}>
-
-                    <summary class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#28634c]">
-
-                        <span class="text-base">⚙</span>
+                <details class="admin-menu" {{ request()->is('admin/*') ? 'open' : '' }}>
+                    <summary>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-5v2m0 14v2m9-9h-2M5 12H3m15.36-6.36-1.42 1.42M7.06 16.94l-1.42 1.42m12.72 0-1.42-1.42M7.06 7.06 5.64 5.64" /></svg>
                         <span class="flex-1">Student Information</span>
-
-                        <svg
-                            class="admin-arrow h-3.5 w-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="m6 9 6 6 6-6"
-                            />
-                        </svg>
-
+                        <svg class="admin-arrow h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
                     </summary>
 
-                    <div class="mt-1 space-y-1">
-
-                        <a
-                            href="{{ route('admin.dashboard') }}"
-                            class="submenu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                        >
-                            <span>▪</span>
+                    <div class="mt-2 space-y-1">
+                        <a href="{{ route('admin.dashboard') }}" class="submenu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg>
                             <span>Dashboard</span>
                         </a>
-
-                        <a
-                            href="{{ route('admin.students.index') }}"
-                            class="submenu-link {{ request()->routeIs('admin.students.index') ? 'active' : '' }}"
-                        >
-                            <span>♟</span>
+                        <a href="{{ route('admin.students.index') }}" class="submenu-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2m16 0v-2a4 4 0 0 0-3-3.87M14 3.13a4 4 0 0 1 0 7.75M14 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" /></svg>
                             <span>Manage Student Accounts</span>
                         </a>
-
-                        <a
-                            href="{{ route('admin.categories') }}"
-                            class="submenu-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}"
-                        >
-                            <span>▪</span>
+                        <a href="{{ route('admin.categories') }}" class="submenu-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 5h16M4 12h16M4 19h16M8 5v14m8-14v14" /></svg>
                             <span>Manage Categories</span>
                         </a>
 
+                        <p class="px-10 pt-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Admin Pages</p>
+                        <a href="{{ route('admin.dashboard') }}#claim-requests-page" class="submenu-link"><span>Claim Requests</span></a>
+                        <a href="{{ route('admin.dashboard') }}#all-reports-page" class="submenu-link"><span>All Reports</span></a>
+                        <a href="{{ route('admin.dashboard') }}#activity-logs-page" class="submenu-link"><span>Activity Logs</span></a>
+                        <a href="{{ route('admin.dashboard') }}#generate-print-reports-page" class="submenu-link"><span>Generate and Print Reports</span></a>
                     </div>
-
                 </details>
-
             </nav>
 
-            <div class="border-t border-white/10 px-5 py-4">
-                <p class="text-xs font-semibold text-white">
-                    CvSU Lost & Found
-                </p>
-                <p class="mt-1 text-[10px] text-green-200/70">
-                    Administrator Portal
-                </p>
+            <div class="border-t border-white/10 p-4">
+                <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
+                    <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d7b65d] font-bold text-[#173c2d]">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
+                    <div class="min-w-0">
+                        <p class="truncate text-xs font-semibold text-white">{{ auth()->user()->name }}</p>
+                        <p class="mt-1 text-[10px] text-green-100/70">Administrator</p>
+                    </div>
+                </div>
             </div>
-
         </aside>
 
         <div class="min-w-0 flex-1 md:ml-64">
@@ -249,32 +231,6 @@
 
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const adminMenu = document.getElementById('adminMenu');
-
-            if (!adminMenu) return;
-
-            const storageKey = 'cvsuAdminMenuOpenV2';
-
-            adminMenu.open = adminMenu.dataset.forceOpen === 'true'
-                || adminMenu.querySelector('.submenu-link.active') !== null
-                || sessionStorage.getItem(storageKey) === 'true';
-
-            adminMenu.addEventListener('toggle', function () {
-                sessionStorage.setItem(
-                    storageKey,
-                    adminMenu.open ? 'true' : 'false'
-                );
-            });
-
-            adminMenu.querySelectorAll('a').forEach(function (link) {
-                link.addEventListener('click', function () {
-                    sessionStorage.setItem(storageKey, 'true');
-                });
-            });
-        });
-    </script>
 
 </body>
 </html>

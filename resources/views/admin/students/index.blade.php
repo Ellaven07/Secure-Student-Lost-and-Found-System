@@ -100,6 +100,7 @@
     .edit-link { color: #3976a5; }
     .toggle-link { color: #b45353; }
     .activate-link { color: #267246; }
+    .delete-link { color: #b42318; }
 
     .empty-state { padding: 38px 20px; color: #89958d; text-align: center; font-size: 12px; }
     .table-footer {
@@ -300,6 +301,15 @@
                                             class="{{ $student->status === 'active' ? 'toggle-link' : 'activate-link' }}">
                                             {{ $student->status === 'active' ? 'Deactivate' : 'Activate' }}
                                         </button>
+                                    </form>
+
+                                    <form action="{{ route('admin.students.destroy', $student) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Delete this student account? This action cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit" class="delete-link">Delete</button>
                                     </form>
                                 </div>
                             </td>

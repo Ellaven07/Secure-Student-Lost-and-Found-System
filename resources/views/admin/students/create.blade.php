@@ -99,7 +99,7 @@
 
         <div class="border-t border-gray-100 px-6 py-5">
             <h2 class="font-bold text-gray-800">Account Password</h2>
-            <p class="mt-1 text-xs text-gray-500">Set the initial password for the student's account.</p>
+            <p class="mt-1 text-xs text-gray-500">The student can sign in with this email and password while the account is active.</p>
         </div>
 
         <div class="grid gap-5 px-6 pb-6 md:grid-cols-2">
