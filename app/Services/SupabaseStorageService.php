@@ -14,9 +14,21 @@ class SupabaseStorageService
 {
     public function isConfigured(): bool
     {
-        return filled(config('services.supabase.url'))
-            && filled(config('services.supabase.secret_key'))
-            && filled(config('services.supabase.storage_bucket'));
+        return $this->missingConfiguration() === [];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function missingConfiguration(): array
+    {
+        $settings = [
+            'SUPABASE_URL' => config('services.supabase.url'),
+            'SUPABASE_SECRET_KEY' => config('services.supabase.secret_key'),
+            'SUPABASE_STORAGE_BUCKET' => config('services.supabase.storage_bucket'),
+        ];
+
+        return array_keys(array_filter($settings, fn ($value): bool => blank($value)));
     }
 
     public function upload(UploadedFile $photo, int $studentId): ?string

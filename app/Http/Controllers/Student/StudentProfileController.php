@@ -93,9 +93,11 @@ class StudentProfileController extends Controller
         $student = $request->user();
 
         if (! $photoStorage->isConfigured()) {
+            $missingSettings = implode(', ', $photoStorage->missingConfiguration());
+
             return redirect()
                 ->route('student.profile')
-                ->with('error', 'Shared photo storage is not configured yet. Ask the administrator to connect Supabase Storage.');
+                ->with('error', "Shared photo storage is missing server setting(s): {$missingSettings}. Update the .env used by this app, run php artisan config:clear, and restart the server.");
         }
 
         $newPhotoPath = $photoStorage->upload($request->file('profile_photo'), $student->id);
