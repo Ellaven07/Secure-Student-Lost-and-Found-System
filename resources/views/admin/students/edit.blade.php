@@ -108,7 +108,7 @@
             <div class="md:col-span-2">
                 <label class="mb-2 block text-sm font-semibold text-gray-700">Profile Photo</label>
 
-                @if ($student->profile_photo_path)
+                @if ($student->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($student->profile_photo_path))
                     <div class="mb-3 flex items-center gap-4">
                         <img src="{{ asset('storage/'.$student->profile_photo_path) }}"
                              alt="Current profile photo"
@@ -117,9 +117,9 @@
                     </div>
                 @endif
 
-                <input type="file" name="profile_photo" accept="image/*"
+                <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-compress-profile-photo
                        class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-[#174b38]">
-                <p class="mt-1 text-xs text-gray-400">Optional. Maximum file size: 2MB.</p>
+                <p class="mt-1 text-xs text-gray-400" data-photo-compression-message>Optional. Maximum file size: 2 MB. Larger photos are optimized automatically.</p>
             </div>
 
         </div>

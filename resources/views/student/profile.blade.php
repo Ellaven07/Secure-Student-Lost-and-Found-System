@@ -13,8 +13,10 @@
         ->implode('');
 
     $profilePhotoUrl = $student->profile_photo_path
+        && \Illuminate\Support\Facades\Storage::disk('public')->exists($student->profile_photo_path)
         ? \Illuminate\Support\Facades\Storage::disk('public')->url($student->profile_photo_path)
         : null;
+    $isActive = ($student->status ?? 'active') === 'active';
 @endphp
 
 <div class="mx-auto max-w-6xl space-y-6">
@@ -31,12 +33,12 @@
 
     <!-- Profile overview -->
     <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div class="h-28 bg-gradient-to-r from-[#174b38] to-[#28634c]"></div>
+        <div class="h-1.5 bg-gradient-to-r from-[#174b38] via-[#28634c] to-[#d7b65d]"></div>
 
-        <div class="px-6 pb-6">
-            <div class="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
-                    <div class="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-[#e8eee9] text-2xl font-extrabold text-[#174b38] shadow-sm">
+        <div class="p-6 sm:p-8">
+            <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex min-w-0 items-center gap-5">
+                    <div class="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-gray-200 bg-[#e8eee9] text-2xl font-extrabold text-[#174b38] shadow-sm sm:h-24 sm:w-24">
                         @if ($profilePhotoUrl)
                             <img
                                 src="{{ $profilePhotoUrl }}"
@@ -48,27 +50,28 @@
                         @endif
                     </div>
 
-                    <div class="pb-1">
-                        <h2 class="text-xl font-extrabold text-gray-800">
+                    <div class="min-w-0">
+                        <h2 class="break-words text-xl font-bold leading-tight text-gray-900 sm:text-2xl">
                             {{ $student->name }}
                         </h2>
-                        <p class="mt-1 text-sm text-gray-500">
-                            {{ $student->student_no ?: 'Student number not provided' }}
+                        <p class="mt-1.5 text-sm text-gray-500">
+                            Student No. <span class="font-medium text-gray-700">{{ $student->student_no ?: 'Not provided' }}</span>
                         </p>
                         <div class="mt-2 flex flex-wrap items-center gap-2">
-                            <span class="rounded-full bg-green-50 px-3 py-1 text-[11px] font-bold text-green-700">
+                            <span class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold {{ $isActive ? 'border-green-100 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-100 text-gray-600' }}">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $isActive ? 'bg-green-600' : 'bg-gray-500' }}"></span>
                                 {{ ucfirst($student->status ?? 'active') }}
                             </span>
-                            <span class="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600">
+                            <span class="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-[11px] font-semibold text-gray-600">
                                 Student Account
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-left text-xs text-gray-400 sm:pb-2 sm:text-right">
-                    <p>Member since</p>
-                    <p class="mt-1 font-semibold text-gray-600">
+                <div class="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 sm:min-w-44 sm:text-right">
+                    <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Member since</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-700">
                         {{ $student->created_at?->format('F d, Y') ?? 'Not available' }}
                     </p>
                 </div>
@@ -79,34 +82,36 @@
                 method="POST"
                 action="{{ route('student.profile.photo') }}"
                 enctype="multipart/form-data"
-                class="mt-6 border-t border-gray-100 pt-5"
+                class="mt-7 border-t border-gray-100 pt-6"
             >
                 @csrf
 
-                <label for="profile_photo" class="mb-2 block text-sm font-bold text-gray-700">
-                    Profile Photo
-                </label>
+                <div class="mb-4">
+                    <label for="profile_photo" class="block text-sm font-semibold text-gray-800">Update profile photo</label>
+                    <p class="mt-1 text-xs text-gray-500">Choose a clear JPG, PNG, or WEBP image for your account.</p>
+                </div>
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <input
                         id="profile_photo"
                         name="profile_photo"
                         type="file"
+                        data-compress-profile-photo
                         accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                         required
-                        class="block w-full rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-600 file:mr-4 file:border-0 file:bg-[#e8eee9] file:px-4 file:py-3 file:text-xs file:font-bold file:text-[#174b38] hover:file:bg-[#dce9df] sm:max-w-md"
+                        class="block w-full rounded-xl border border-gray-200 bg-white text-sm text-gray-600 file:mr-4 file:cursor-pointer file:border-0 file:bg-gray-100 file:px-4 file:py-3 file:text-xs file:font-semibold file:text-gray-700 hover:file:bg-gray-200 sm:max-w-lg"
                     >
 
                     <button
                         type="submit"
-                        class="rounded-xl bg-[#174b38] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#28634c]"
+                        class="rounded-xl bg-[#174b38] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#28634c] focus:outline-none focus:ring-2 focus:ring-[#28634c] focus:ring-offset-2"
                     >
                         Upload Photo
                     </button>
                 </div>
 
-                <p class="mt-2 text-xs text-gray-400">
-                    JPG, JPEG, PNG, or WEBP. Maximum file size: 2 MB.
+                <p class="mt-2 text-xs text-gray-400" data-photo-compression-message>
+                    JPG, JPEG, PNG, or WEBP. Maximum file size: 2 MB. Larger photos are optimized automatically.
                 </p>
 
                 @error('profile_photo')
