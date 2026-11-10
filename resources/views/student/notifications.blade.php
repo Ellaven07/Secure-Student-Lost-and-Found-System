@@ -1,7 +1,7 @@
 
-@extends('layouts.student')
+@extends(auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.student')
 
-@section('title', 'Notifications')
+@section('title', auth()->user()->isAdmin() ? 'Admin Notifications' : 'Notifications')
 @section('page-label', 'Notifications')
 
 @section('content')
@@ -175,6 +175,18 @@
     }
     .read-dot { visibility: hidden; }
 
+    .notification-read-button {
+        border: 0;
+        background: transparent;
+        color: #28634c;
+        padding: 3px 0;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .notification-read-button:hover { text-decoration: underline; }
+
     .empty-notifications {
         display: none;
         text-align: center;
@@ -199,177 +211,137 @@
 <div class="notifications-page">
 
     <div class="notification-heading">
-        <h1>Notifications</h1>
-        <p>Stay updated on lost and found items and important announcements.</p>
+        <h1>{{ $isAdmin ? 'Admin Notifications' : 'Notifications' }}</h1>
+        <p>
+            {{ $isAdmin
+                ? 'Review student account activity and administration updates.'
+                : 'See account updates and messages from your CvSU administrators.' }}
+        </p>
     </div>
 
     <div class="notification-stats">
         <div class="notification-stat">
             <span>Total Notifications</span>
-            <h2 id="totalCount">5</h2>
+            <h2>{{ number_format($totalNotifications) }}</h2>
         </div>
         <div class="notification-stat">
             <span>Unread Notifications</span>
-            <h2 id="unreadCount">3</h2>
+            <h2>{{ number_format($unreadNotifications) }}</h2>
         </div>
         <div class="notification-stat">
             <span>Read Notifications</span>
-            <h2 id="readCount">2</h2>
+            <h2>{{ number_format($readNotifications) }}</h2>
         </div>
     </div>
 
     <div class="notification-panel">
-
         <div class="notification-toolbar">
             <div>
                 <h2>Recent Notifications</h2>
-                <p>Updates and alerts from the Lost and Found System</p>
+                <p>
+                    {{ $isAdmin
+                        ? 'New student accounts and updates that need your attention.'
+                        : 'Messages about your student account and its status.' }}
+                </p>
             </div>
 
             <div class="notification-actions">
-                <button type="button" onclick="markAllRead()">Mark all as read</button>
-                <button type="button" onclick="clearNotifications()">Clear all</button>
+                <form method="POST" action="{{ route('notifications.read-all') }}">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" @disabled($unreadNotifications === 0)>Mark all as read</button>
+                </form>
+                <form method="POST" action="{{ route('notifications.clear') }}" onsubmit="return confirm('Clear all your notifications?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" @disabled($totalNotifications === 0)>Clear all</button>
+                </form>
             </div>
         </div>
 
         <div class="notification-filters">
-            <button class="filter-btn active" onclick="filterNotifications('all', this)">All</button>
-            <button class="filter-btn" onclick="filterNotifications('unread', this)">Unread</button>
-            <button class="filter-btn" onclick="filterNotifications('read', this)">Read</button>
+            <button class="filter-btn active" type="button" onclick="filterNotifications('all', this)">All</button>
+            <button class="filter-btn" type="button" onclick="filterNotifications('unread', this)">Unread</button>
+            <button class="filter-btn" type="button" onclick="filterNotifications('read', this)">Read</button>
         </div>
 
         <div id="notificationList">
+            @forelse ($notifications as $notification)
+                @php
+                    $isRead = $notification->read_at !== null;
+                    $notificationStyle = match ($notification->type) {
+                        'success' => ['class' => 'success', 'icon' => '✓'],
+                        'warning' => ['class' => 'warning', 'icon' => '!'],
+                        default => ['class' => 'info', 'icon' => 'i'],
+                    };
+                @endphp
 
-            <div class="notification-item unread success" data-status="unread">
-                <div class="notification-icon">✓</div>
-                <div class="notification-content">
-                    <h3>Item Successfully Reported</h3>
-                    <p>Your lost item report has been submitted successfully. You can check its status in your reports.</p>
-                    <span class="notification-time">Today · 9:30 AM</span>
+                <article
+                    class="notification-item {{ $isRead ? '' : 'unread' }} {{ $notificationStyle['class'] }}"
+                    data-status="{{ $isRead ? 'read' : 'unread' }}"
+                >
+                    <div class="notification-icon" aria-hidden="true">{{ $notificationStyle['icon'] }}</div>
+                    <div class="notification-content">
+                        <h3>{{ $notification->title }}</h3>
+                        <p>{{ $notification->message }}</p>
+                        <span class="notification-time">
+                            {{ \Illuminate\Support\Carbon::parse($notification->created_at)->diffForHumans() }}
+                        </span>
+                        @if (! $isRead)
+                            <form method="POST" action="{{ route('notifications.read', $notification->id) }}">
+                                @csrf
+                                @method('PATCH')
+                                <button class="notification-read-button" type="submit">Mark as read</button>
+                            </form>
+                        @endif
+                    </div>
+                    <span class="unread-dot {{ $isRead ? 'read-dot' : '' }}" aria-label="{{ $isRead ? 'Read' : 'Unread' }}"></span>
+                </article>
+            @empty
+                <div class="empty-notifications" id="emptyNotifications" style="display: block;">
+                    <span aria-hidden="true">♢</span>
+                    {{ $isAdmin ? 'No administrator notifications yet.' : 'No student notifications yet.' }}
                 </div>
-                <span class="unread-dot"></span>
-            </div>
-
-            <div class="notification-item unread info" data-status="unread">
-                <div class="notification-icon">🔎</div>
-                <div class="notification-content">
-                    <h3>Possible Item Match</h3>
-                    <p>A newly reported found item may match the description of an item you reported.</p>
-                    <span class="notification-time">Today · 8:15 AM</span>
-                </div>
-                <span class="unread-dot"></span>
-            </div>
-
-            <div class="notification-item unread warning" data-status="unread">
-                <div class="notification-icon">📢</div>
-                <div class="notification-content">
-                    <h3>Claim Reminder</h3>
-                    <p>Please remember to bring your valid student ID when claiming a found item.</p>
-                    <span class="notification-time">Yesterday · 3:45 PM</span>
-                </div>
-                <span class="unread-dot"></span>
-            </div>
-
-            <div class="notification-item" data-status="read">
-                <div class="notification-icon">📦</div>
-                <div class="notification-content">
-                    <h3>Found Item Received</h3>
-                    <p>Your reported item has been received by the Lost and Found office for verification.</p>
-                    <span class="notification-time">November 7 · 10:20 AM</span>
-                </div>
-                <span class="unread-dot read-dot"></span>
-            </div>
-
-            <div class="notification-item" data-status="read">
-                <div class="notification-icon">ℹ️</div>
-                <div class="notification-content">
-                    <h3>System Announcement</h3>
-                    <p>Always provide accurate descriptions and clear photos when submitting lost or found item reports.</p>
-                    <span class="notification-time">November 6 · 1:00 PM</span>
-                </div>
-                <span class="unread-dot read-dot"></span>
-            </div>
-
+            @endforelse
         </div>
 
-        <div class="empty-notifications" id="emptyNotifications">
-            <span>🔔</span>
-            No notifications found.
-        </div>
-
+        @if ($notifications->isNotEmpty())
+            <div class="empty-notifications" id="emptyNotifications">
+                <span aria-hidden="true">♢</span>
+                No notifications match this filter.
+            </div>
+            <div class="pagination-wrapper">
+                {{ $notifications->links() }}
+            </div>
+        @endif
     </div>
-
 </div>
 
 <script>
-    function updateNotificationCounts() {
-        const items = document.querySelectorAll('.notification-item');
-        const unread = document.querySelectorAll('.notification-item[data-status="unread"]').length;
-        const total = items.length;
-
-        document.getElementById('totalCount').textContent = total;
-        document.getElementById('unreadCount').textContent = unread;
-        document.getElementById('readCount').textContent = total - unread;
-
-        document.querySelectorAll('.notification-item').forEach(item => {
-            const dot = item.querySelector('.unread-dot');
-
-            if (item.dataset.status === 'read') {
-                item.classList.remove('unread');
-                dot.classList.add('read-dot');
-            } else {
-                item.classList.add('unread');
-                dot.classList.remove('read-dot');
-            }
-        });
-    }
-
     function filterNotifications(status, button) {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
+        document.querySelectorAll('.filter-btn').forEach((filterButton) => {
+            filterButton.classList.remove('active');
         });
 
         button.classList.add('active');
 
         let visible = 0;
 
-        document.querySelectorAll('.notification-item').forEach(item => {
+        document.querySelectorAll('.notification-item').forEach((item) => {
             const matches = status === 'all' || item.dataset.status === status;
             item.style.display = matches ? 'flex' : 'none';
 
-            if (matches) visible++;
+            if (matches) {
+                visible++;
+            }
         });
 
-        document.getElementById('emptyNotifications').style.display =
-            visible === 0 ? 'block' : 'none';
-    }
+        const emptyState = document.getElementById('emptyNotifications');
 
-    function markAllRead() {
-        document.querySelectorAll('.notification-item').forEach(item => {
-            item.dataset.status = 'read';
-        });
-
-        updateNotificationCounts();
-
-        const activeFilter = document.querySelector('.filter-btn.active');
-
-        if (activeFilter) {
-            filterNotifications('all', document.querySelector('.filter-btn'));
+        if (emptyState) {
+            emptyState.style.display = visible === 0 ? 'block' : 'none';
         }
     }
-
-    function clearNotifications() {
-        if (!confirm('Are you sure you want to clear all sample notifications?')) {
-            return;
-        }
-
-        document.getElementById('notificationList').innerHTML = '';
-        updateNotificationCounts();
-
-        document.getElementById('emptyNotifications').style.display = 'block';
-    }
-
-    updateNotificationCounts();
 </script>
 
 @endsection

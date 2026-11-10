@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
@@ -38,20 +39,15 @@ class StudentController extends Controller
                         ->orWhere('course', 'like', "%{$search}%");
                 });
             })
-            ->when($request->filled('department'), fn ($query) =>
-                $query->where('department', $request->department)
+            ->when($request->filled('department'), fn ($query) => $query->where('department', $request->department)
             )
-            ->when($request->filled('course'), fn ($query) =>
-                $query->where('course', $request->course)
+            ->when($request->filled('course'), fn ($query) => $query->where('course', $request->course)
             )
-            ->when($request->filled('year_level'), fn ($query) =>
-                $query->where('year_level', $request->year_level)
+            ->when($request->filled('year_level'), fn ($query) => $query->where('year_level', $request->year_level)
             )
-            ->when($request->status === 'active', fn ($query) =>
-                $query->where('status', 'active')
+            ->when($request->status === 'active', fn ($query) => $query->where('status', 'active')
             )
-            ->when($request->status === 'inactive', fn ($query) =>
-                $query->where('status', '!=', 'active')
+            ->when($request->status === 'inactive', fn ($query) => $query->where('status', '!=', 'active')
             )
             ->orderBy('name')
             ->paginate(10)
@@ -110,6 +106,19 @@ class StudentController extends Controller
         $validated['role'] = 'student';
 
         $student = User::create($validated);
+
+        $this->createNotification(
+            $student->id,
+            'Your student account is ready',
+            'An administrator created your student account. You can now sign in to the system.',
+            'success'
+        );
+
+        $this->notifyAdministrators(
+            'New student account',
+            $student->name.' ('.$student->email.') was added to Student Management.',
+            'info'
+        );
 
         $this->logActivity(
             'Created student account',
@@ -174,6 +183,13 @@ class StudentController extends Controller
 
         $student->update($validated);
 
+        $this->createNotification(
+            $student->id,
+            'Your account information was updated',
+            'An administrator updated your student account information.',
+            'info'
+        );
+
         $this->logActivity(
             'Updated student account',
             'Updated student account for '.$student->name.'.'
@@ -194,6 +210,13 @@ class StudentController extends Controller
 
         $student->save();
 
+        $this->createNotification(
+            $student->id,
+            'Your account status changed',
+            'An administrator changed your account status to '.$student->status.'.',
+            $student->status === 'active' ? 'success' : 'warning'
+        );
+
         $this->logActivity(
             'Changed student status',
             'Changed '.$student->name.' status to '.$student->status.'.'
@@ -213,6 +236,13 @@ class StudentController extends Controller
         $student->password = $validated['password'];
         $student->save();
 
+        $this->createNotification(
+            $student->id,
+            'Your password was reset',
+            'An administrator reset your password. Contact the office if you did not expect this change.',
+            'warning'
+        );
+
         $this->logActivity(
             'Reset student password',
             'Reset password for '.$student->name.'.'
@@ -226,9 +256,30 @@ class StudentController extends Controller
         abort_unless($student->role === 'student', 404);
     }
 
+    private function notifyAdministrators(string $title, string $message, string $type): void
+    {
+        User::query()
+            ->where('role', 'admin')
+            ->pluck('id')
+            ->each(fn (int $adminId) => $this->createNotification($adminId, $title, $message, $type));
+    }
+
+    private function createNotification(int $userId, string $title, string $message, string $type): void
+    {
+        DB::table('notifications')->insert([
+            'id' => (string) Str::uuid(),
+            'user_id' => $userId,
+            'title' => $title,
+            'message' => $message,
+            'type' => $type,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     private function logActivity(string $action, string $details)
     {
-        if (!Schema::hasTable('activity_logs')) {
+        if (! Schema::hasTable('activity_logs')) {
             return;
         }
 

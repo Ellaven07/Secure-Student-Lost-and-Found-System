@@ -29,6 +29,7 @@
             <nav class="flex-1 px-4 py-5">
                 <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Administration</p>
                 <div class="space-y-1">
+                    <a href="{{ route('admin.notifications') }}" class="portal-link {{ request()->routeIs('admin.notifications') ? 'active' : '' }}"><span aria-hidden="true">♢</span><span>Notifications</span></a>
                     <a href="{{ route('admin.dashboard') }}" class="portal-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><span aria-hidden="true">⌂</span><span>Dashboard</span></a>
                     <a href="{{ route('admin.students.index') }}" class="portal-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}"><span aria-hidden="true">♙</span><span>Manage Student Accounts</span></a>
                     <a href="{{ route('admin.categories') }}" class="portal-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}"><span aria-hidden="true">▦</span><span>Manage Categories</span></a>
@@ -47,6 +48,11 @@
                     <h2 class="mt-1 text-lg font-bold text-gray-800">@yield('title', 'Admin Dashboard')</h2>
                 </div>
                 <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.notifications') }}" title="Notifications" aria-label="Notifications" class="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-[#174b38]">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0" />
+                        </svg>
+                    </a>
                     <span class="hidden text-sm font-semibold text-gray-700 sm:inline">{{ auth()->user()->name }}</span>
                     <div class="grid h-10 w-10 place-items-center rounded-full bg-[#e8eee9] font-bold text-[#174b38]">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
                     <form method="POST" action="{{ route('logout') }}">

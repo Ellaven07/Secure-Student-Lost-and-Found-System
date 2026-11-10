@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage
@@ -39,6 +40,17 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+Route::middleware(['auth', 'role:admin,student', 'frontend-preview'])->group(function () {
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.read-all');
+
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
+
+    Route::delete('/notifications', [NotificationController::class, 'clear'])
+        ->name('notifications.clear');
+});
+
 // Admin Routes
 Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function () {
 
@@ -48,6 +60,9 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
 
     Route::get('/admin/dashboard/export', [AdminDashboardController::class, 'export'])
         ->name('admin.dashboard.export');
+
+    Route::get('/admin/notifications', [NotificationController::class, 'index'])
+        ->name('admin.notifications');
 
     // Student Management
     Route::get('/admin/students', [StudentController::class, 'index'])
@@ -94,6 +109,6 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
     Route::view('/student/profile', 'student.profile')
         ->name('student.profile');
 
-    Route::view('/student/notifications', 'student.notifications')
+    Route::get('/student/notifications', [NotificationController::class, 'index'])
         ->name('student.notifications');
 });
