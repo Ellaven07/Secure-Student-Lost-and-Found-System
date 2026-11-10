@@ -208,9 +208,9 @@
                         </p>
                     </div>
 
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8eee9] font-bold text-[#174b38]">
+                    <a href="{{ route('admin.profile') }}" title="View admin profile" aria-label="View admin profile" class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8eee9] font-bold text-[#174b38] transition hover:bg-[#d7e4dc] focus:outline-none focus:ring-2 focus:ring-[#174b38] focus:ring-offset-2">
                         {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
-                    </div>
+                    </a>
 
                 </div>
 

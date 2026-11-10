@@ -63,6 +63,9 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
     Route::get('/admin/notifications', [NotificationController::class, 'index'])
         ->name('admin.notifications');
 
+    Route::view('/admin/profile', 'admin.profile')
+        ->name('admin.profile');
+
     // Student Management
     Route::get('/admin/students', [StudentController::class, 'index'])
         ->name('admin.students.index');
