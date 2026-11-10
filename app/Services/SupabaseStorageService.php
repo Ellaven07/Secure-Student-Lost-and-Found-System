@@ -49,8 +49,10 @@ class SupabaseStorageService
                 ])
                 ->withBody($photo->getContent(), $photo->getMimeType() ?: 'application/octet-stream')
                 ->post($this->objectUrl($objectPath));
-        } catch (ConnectionException) {
-            Log::warning('Supabase profile photo upload could not connect.');
+        } catch (ConnectionException $exception) {
+            Log::warning('Supabase profile photo upload could not connect.', [
+                'error' => Str::limit($exception->getMessage(), 300),
+            ]);
 
             return null;
         }
