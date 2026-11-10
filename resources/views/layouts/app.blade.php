@@ -96,7 +96,7 @@
                     <summary class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#28634c]">
 
                         <span class="text-base">⚙</span>
-                        <span class="flex-1">Admin</span>
+                        <span class="flex-1">Student Information</span>
 
                         <svg
                             class="admin-arrow h-3.5 w-3.5"
