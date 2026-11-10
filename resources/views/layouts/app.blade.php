@@ -125,14 +125,6 @@
                         </a>
 
                         <a
-                            href="{{ route('student.profile') }}"
-                            class="submenu-link {{ request()->routeIs('student.profile') ? 'active' : '' }}"
-                        >
-                            <span>♙</span>
-                            <span>Student Profile</span>
-                        </a>
-
-                        <a
                             href="{{ route('admin.categories') }}"
                             class="submenu-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}"
                         >
@@ -173,40 +165,32 @@
 
                 <div class="flex items-center gap-4">
 
-                    <a
-                        href="{{ route('student.notifications') }}"
-                        title="View Notifications"
-                        aria-label="View Notifications"
-                        class="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-[#174b38] {{ request()->routeIs('student.notifications') ? 'bg-[#e8eee9] text-[#174b38]' : '' }}"
-                    >
-                        <svg
-                            class="h-6 w-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button
+                            type="submit"
+                            title="Sign out"
+                            aria-label="Sign out"
+                            class="flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.8"
-                                d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0"
-                            />
-                        </svg>
-
-                        <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                    </a>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5m5 5H3" />
+                            </svg>
+                            <span class="hidden sm:inline">Sign out</span>
+                        </button>
+                    </form>
 
                     <div class="hidden text-right sm:block">
                         <p class="text-sm font-semibold text-gray-800">
-                            Administrator
+                            {{ auth()->user()->name }}
                         </p>
                         <p class="text-xs text-gray-500">
-                            System Management
+                            Administrator
                         </p>
                     </div>
 
                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8eee9] font-bold text-[#174b38]">
-                        A
+                        {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
                     </div>
 
                 </div>
