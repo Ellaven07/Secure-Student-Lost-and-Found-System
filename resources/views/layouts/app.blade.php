@@ -198,7 +198,7 @@
     </svg>
 
     @if (($unreadNotificationCount ?? 0) > 0)
-        <span class="absolute right-0 top-0 z-10 flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1 text-[9px] font-extrabold leading-none text-white shadow">
+        <span class="absolute -right-1 -top-1 z-10 flex h-5 min-w-5 items-center justify-center rounded-md bg-red-700 px-1.5 text-[10px] font-bold leading-none text-white">
             {{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}
         </span>
     @endif
