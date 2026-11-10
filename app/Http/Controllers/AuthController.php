@@ -45,7 +45,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route($user->isAdmin() ? 'admin.dashboard' : 'student.dashboard');
+        return redirect()->route($user->isAdmin() ? 'admin.students.index' : 'student.dashboard');
     }
 
     public function logout(Request $request): RedirectResponse
