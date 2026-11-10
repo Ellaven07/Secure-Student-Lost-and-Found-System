@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->group('frontend-preview', []);
+        $middleware->redirectUsersTo(fn (Request $request): string => $request->user()?->isAdmin()
+            ? route('admin.students.index')
+            : route('student.dashboard'));
+
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
         ]);
