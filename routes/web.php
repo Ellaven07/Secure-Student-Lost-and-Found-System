@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Student\StudentProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
@@ -120,8 +121,17 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
     Route::view('/student/dashboard', 'student.dashboard')
         ->name('student.dashboard');
 
-    Route::view('/student/profile', 'student.profile')
+    Route::get('/student/profile', [StudentProfileController::class, 'show'])
         ->name('student.profile');
+
+    Route::put('/student/profile', [StudentProfileController::class, 'update'])
+        ->name('student.profile.update');
+
+    Route::post('/student/profile/photo', [StudentProfileController::class, 'updatePhoto'])
+        ->name('student.profile.photo');
+
+    Route::put('/student/profile/password', [StudentProfileController::class, 'updatePassword'])
+        ->name('student.profile.password');
 
     Route::get('/student/notifications', [NotificationController::class, 'index'])
         ->name('student.notifications');

@@ -5,308 +5,382 @@
 
 @section('content')
 
-<style>
-    .profile-page {
-        color: #24352d;
-    }
+@php
+    $initials = collect(preg_split('/\s+/', trim($student->name)))
+        ->filter()
+        ->take(2)
+        ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
+        ->implode('');
 
-    .profile-heading {
-        margin-bottom: 24px;
-    }
+    $profilePhotoUrl = $student->profile_photo_path
+        ? \Illuminate\Support\Facades\Storage::disk('public')->url($student->profile_photo_path)
+        : null;
+@endphp
 
-    .profile-heading h1 {
-        font-size: 25px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        color: #174b38;
-    }
+<div class="mx-auto max-w-6xl space-y-6">
 
-    .profile-heading p {
-        color: #77847d;
-        font-size: 14px;
-    }
+    <!-- Page heading -->
+    <section>
+        <h1 class="text-2xl font-extrabold tracking-tight text-[#174b38]">
+            My Profile
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+            Manage your student account information and security settings.
+        </p>
+    </section>
 
-    .profile-card {
-        background: #fff;
-        border: 1px solid #e8eee9;
-        border-radius: 14px;
-        padding: 25px;
-        margin-bottom: 22px;
-        box-shadow: 0 3px 12px rgba(24, 60, 43, .04);
-    }
+    <!-- Profile overview -->
+    <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div class="h-28 bg-gradient-to-r from-[#174b38] to-[#28634c]"></div>
 
-    .profile-banner {
-        display: flex;
-        align-items: center;
-        gap: 22px;
-        flex-wrap: wrap;
-    }
+        <div class="px-6 pb-6">
+            <div class="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
+                    <div class="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-[#e8eee9] text-2xl font-extrabold text-[#174b38] shadow-sm">
+                        @if ($profilePhotoUrl)
+                            <img
+                                src="{{ $profilePhotoUrl }}"
+                                alt="Profile photo of {{ $student->name }}"
+                                class="h-full w-full object-cover"
+                            >
+                        @else
+                            {{ $initials ?: 'S' }}
+                        @endif
+                    </div>
 
-    .profile-avatar {
-        width: 95px;
-        height: 95px;
-        border-radius: 50%;
-        background: #e5eee8;
-        color: #174b38;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 32px;
-        font-weight: 700;
-        border: 4px solid #f5f8f5;
-    }
+                    <div class="pb-1">
+                        <h2 class="text-xl font-extrabold text-gray-800">
+                            {{ $student->name }}
+                        </h2>
+                        <p class="mt-1 text-sm text-gray-500">
+                            {{ $student->student_no ?: 'Student number not provided' }}
+                        </p>
+                        <div class="mt-2 flex flex-wrap items-center gap-2">
+                            <span class="rounded-full bg-green-50 px-3 py-1 text-[11px] font-bold text-green-700">
+                                {{ ucfirst($student->status ?? 'active') }}
+                            </span>
+                            <span class="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600">
+                                Student Account
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-    .profile-main-info {
-        flex: 1;
-    }
-
-    .profile-main-info h2 {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 5px;
-        color: #174b38;
-    }
-
-    .profile-main-info p {
-        color: #77847d;
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 5px 12px;
-        background: #e7f5eb;
-        color: #258047;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .section-title {
-        font-size: 17px;
-        font-weight: 700;
-        color: #174b38;
-        margin-bottom: 22px;
-        padding-bottom: 14px;
-        border-bottom: 1px solid #edf0ed;
-    }
-
-    .profile-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px;
-    }
-
-    .info-item label {
-        display: block;
-        font-size: 12px;
-        color: #87928b;
-        margin-bottom: 7px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .4px;
-    }
-
-    .info-item p {
-        color: #34483c;
-        font-size: 14px;
-        font-weight: 500;
-        margin: 0;
-        overflow-wrap: anywhere;
-    }
-
-    .profile-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 22px;
-    }
-
-    .profile-btn {
-        padding: 10px 18px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        border: none;
-    }
-
-    .btn-edit {
-        background: #174b38;
-        color: white;
-    }
-
-    .btn-edit:hover {
-        background: #103b2b;
-    }
-
-    .btn-secondary {
-        background: #f1f4f1;
-        color: #43564a;
-    }
-
-    .profile-note {
-        background: #f8faf8;
-        border: 1px solid #e8eee9;
-        border-radius: 10px;
-        padding: 16px;
-        color: #65756b;
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    @media(max-width: 650px) {
-        .profile-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .profile-card {
-            padding: 18px;
-        }
-
-        .profile-avatar {
-            width: 75px;
-            height: 75px;
-            font-size: 26px;
-        }
-    }
-</style>
-
-<div class="profile-page">
-
-    <div class="profile-heading">
-        <h1>Student Profile</h1>
-        <p>View and manage your personal student information.</p>
-    </div>
-
-    <!-- Profile Overview -->
-    <div class="profile-card">
-        <div class="profile-banner">
-
-            <div class="profile-avatar">
-                JD
+                <div class="text-left text-xs text-gray-400 sm:pb-2 sm:text-right">
+                    <p>Member since</p>
+                    <p class="mt-1 font-semibold text-gray-600">
+                        {{ $student->created_at?->format('F d, Y') ?? 'Not available' }}
+                    </p>
+                </div>
             </div>
 
-            <div class="profile-main-info">
-                <h2>Juan Dela Cruz</h2>
-                <p>Student ID: 2024-00001</p>
-                <span class="status-badge">Active Student</span>
-            </div>
+            <!-- Profile photo upload -->
+            <form
+                method="POST"
+                action="{{ route('student.profile.photo') }}"
+                enctype="multipart/form-data"
+                class="mt-6 border-t border-gray-100 pt-5"
+            >
+                @csrf
 
+                <label for="profile_photo" class="mb-2 block text-sm font-bold text-gray-700">
+                    Profile Photo
+                </label>
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <input
+                        id="profile_photo"
+                        name="profile_photo"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        required
+                        class="block w-full rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-600 file:mr-4 file:border-0 file:bg-[#e8eee9] file:px-4 file:py-3 file:text-xs file:font-bold file:text-[#174b38] hover:file:bg-[#dce9df] sm:max-w-md"
+                    >
+
+                    <button
+                        type="submit"
+                        class="rounded-xl bg-[#174b38] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#28634c]"
+                    >
+                        Upload Photo
+                    </button>
+                </div>
+
+                <p class="mt-2 text-xs text-gray-400">
+                    JPG, JPEG, PNG, or WEBP. Maximum file size: 2 MB.
+                </p>
+
+                @error('profile_photo')
+                    <p class="mt-2 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
+            </form>
         </div>
-    </div>
+    </section>
 
-    <!-- Personal Information -->
-    <div class="profile-card">
-
-        <h3 class="section-title">Personal Information</h3>
-
-        <div class="profile-grid">
-
-            <div class="info-item">
-                <label>First Name</label>
-                <p>Juan</p>
-            </div>
-
-            <div class="info-item">
-                <label>Last Name</label>
-                <p>Dela Cruz</p>
-            </div>
-
-            <div class="info-item">
-                <label>Middle Name</label>
-                <p>Santos</p>
-            </div>
-
-            <div class="info-item">
-                <label>Date of Birth</label>
-                <p>January 15, 2005</p>
-            </div>
-
-            <div class="info-item">
-                <label>Gender</label>
-                <p>Male</p>
-            </div>
-
-            <div class="info-item">
-                <label>Contact Number</label>
-                <p>0912 345 6789</p>
-            </div>
-
-            <div class="info-item">
-                <label>Email Address</label>
-                <p>juan.delacruz@example.com</p>
-            </div>
-
-            <div class="info-item">
-                <label>Address</label>
-                <p>Indang, Cavite, Philippines</p>
-            </div>
-
+    <!-- Account statistics -->
+    <section>
+        <div class="mb-4">
+            <h2 class="text-base font-extrabold text-gray-800">My Activity</h2>
+            <p class="mt-1 text-xs text-gray-500">
+                Summary of your reports and claim submissions.
+            </p>
         </div>
 
-    </div>
-
-    <!-- Academic Information -->
-    <div class="profile-card">
-
-        <h3 class="section-title">Academic Information</h3>
-
-        <div class="profile-grid">
-
-            <div class="info-item">
-                <label>Student ID</label>
-                <p>2024-00001</p>
+        <div class="grid gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-gray-500">Lost Reports</p>
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-lg text-amber-700" aria-hidden="true">⌕</span>
+                </div>
+                <p class="mt-4 text-3xl font-extrabold text-gray-800">
+                    {{ number_format($statistics['lost_reports'] ?? 0) }}
+                </p>
+                <p class="mt-1 text-xs text-gray-400">Reports submitted as lost</p>
             </div>
 
-            <div class="info-item">
-                <label>College / Department</label>
-                <p>College of Information Technology</p>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-gray-500">Found Reports</p>
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-green-50 text-lg text-green-700" aria-hidden="true">✓</span>
+                </div>
+                <p class="mt-4 text-3xl font-extrabold text-gray-800">
+                    {{ number_format($statistics['found_reports'] ?? 0) }}
+                </p>
+                <p class="mt-1 text-xs text-gray-400">Reports submitted as found</p>
             </div>
 
-            <div class="info-item">
-                <label>Course</label>
-                <p>BS Information Technology</p>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-gray-500">My Claims</p>
+                    <span class="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-lg text-blue-700" aria-hidden="true">▤</span>
+                </div>
+                <p class="mt-4 text-3xl font-extrabold text-gray-800">
+                    {{ number_format($statistics['claims'] ?? 0) }}
+                </p>
+                <p class="mt-1 text-xs text-gray-400">Claims submitted</p>
             </div>
+        </div>
+    </section>
 
-            <div class="info-item">
-                <label>Year Level</label>
-                <p>2nd Year</p>
-            </div>
-
-            <div class="info-item">
-                <label>Academic Status</label>
-                <p>Regular</p>
-            </div>
-
-            <div class="info-item">
-                <label>Account Type</label>
-                <p>Student</p>
-            </div>
-
+    <!-- Personal and academic information -->
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-7">
+        <div class="mb-6">
+            <h2 class="text-base font-extrabold text-gray-800">
+                Personal & Academic Information
+            </h2>
+            <p class="mt-1 text-xs text-gray-500">
+                Update the information associated with your student account.
+            </p>
         </div>
 
-        <div class="profile-actions">
-            <button type="button" class="profile-btn btn-secondary">
-                Cancel
-            </button>
+        <form method="POST" action="{{ route('student.profile.update') }}">
+            @csrf
+            @method('PUT')
 
-            <button type="button" class="profile-btn btn-edit"
-                onclick="alert('Edit Profile will be available in a future update.')">
-                Edit Profile
-            </button>
+            <div class="grid gap-5 sm:grid-cols-2">
+
+                <div class="sm:col-span-2">
+                    <label for="name" class="mb-2 block text-xs font-bold text-gray-700">
+                        Full Name <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        value="{{ old('name', $student->name) }}"
+                        required
+                        maxlength="255"
+                        autocomplete="name"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('name')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="email" class="mb-2 block text-xs font-bold text-gray-700">
+                        Email Address <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value="{{ old('email', $student->email) }}"
+                        required
+                        maxlength="255"
+                        autocomplete="email"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('email')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="student_no" class="mb-2 block text-xs font-bold text-gray-700">
+                        Student Number
+                    </label>
+                    <input
+                        id="student_no"
+                        name="student_no"
+                        type="text"
+                        value="{{ old('student_no', $student->student_no) }}"
+                        maxlength="255"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('student_no')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="department" class="mb-2 block text-xs font-bold text-gray-700">
+                        College / Department
+                    </label>
+                    <input
+                        id="department"
+                        name="department"
+                        type="text"
+                        value="{{ old('department', $student->department) }}"
+                        maxlength="255"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('department')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="course" class="mb-2 block text-xs font-bold text-gray-700">
+                        Course / Program
+                    </label>
+                    <input
+                        id="course"
+                        name="course"
+                        type="text"
+                        value="{{ old('course', $student->course) }}"
+                        maxlength="255"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('course')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="year_level" class="mb-2 block text-xs font-bold text-gray-700">
+                        Year Level
+                    </label>
+                    <input
+                        id="year_level"
+                        name="year_level"
+                        type="text"
+                        value="{{ old('year_level', $student->year_level) }}"
+                        maxlength="255"
+                        placeholder="e.g. 1st Year"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('year_level')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="mt-7 flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:justify-end">
+                <a
+                    href="{{ route('student.profile') }}"
+                    class="rounded-xl border border-gray-200 px-5 py-3 text-center text-xs font-bold text-gray-600 transition hover:bg-gray-50"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="rounded-xl bg-[#174b38] px-6 py-3 text-xs font-bold text-white transition hover:bg-[#28634c]"
+                >
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Password and security -->
+    <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-7">
+        <div class="mb-6">
+            <h2 class="text-base font-extrabold text-gray-800">Password & Security</h2>
+            <p class="mt-1 text-xs text-gray-500">
+                Change your password to help keep your account secure.
+            </p>
         </div>
 
-    </div>
+        <form method="POST" action="{{ route('student.profile.password') }}">
+            @csrf
+            @method('PUT')
 
-    <div class="profile-note">
-        <strong>Note:</strong> This is a sample student profile for the frontend
-        prototype. Actual student information and profile editing will be
-        connected after database integration.
-    </div>
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label for="current_password" class="mb-2 block text-xs font-bold text-gray-700">
+                        Current Password <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        id="current_password"
+                        name="current_password"
+                        type="password"
+                        required
+                        autocomplete="current-password"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100 sm:max-w-xl"
+                    >
+                    @error('current_password')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
+                <div>
+                    <label for="password" class="mb-2 block text-xs font-bold text-gray-700">
+                        New Password <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        autocomplete="new-password"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                    @error('password')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password_confirmation" class="mb-2 block text-xs font-bold text-gray-700">
+                        Confirm New Password <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        id="password_confirmation"
+                        name="password_confirmation"
+                        type="password"
+                        required
+                        autocomplete="new-password"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-[#28634c] focus:bg-white focus:ring-2 focus:ring-green-100"
+                    >
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end border-t border-gray-100 pt-5">
+                <button
+                    type="submit"
+                    class="rounded-xl bg-[#174b38] px-6 py-3 text-xs font-bold text-white transition hover:bg-[#28634c]"
+                >
+                    Update Password
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <p class="pb-2 text-center text-[11px] text-gray-400">
+        Your account information is private and connected to your authenticated student account.
+    </p>
 </div>
 
 @endsection
