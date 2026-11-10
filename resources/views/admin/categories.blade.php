@@ -30,10 +30,7 @@
         padding: 20px;
         box-shadow: 0 3px 12px rgba(24,60,43,.04);
     }
-    .summary-card span {
-        color: #849087;
-        font-size: 13px;
-    }
+    .summary-card span { color: #849087; font-size: 13px; }
     .summary-card h2 {
         color: #174b38;
         font-size: 27px;
@@ -113,15 +110,6 @@
         border-radius: 9px;
         font-size: 17px;
     }
-    .category-status {
-        display: inline-block;
-        padding: 5px 11px;
-        background: #e8f5eb;
-        color: #278047;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-    }
     .action-btn {
         background: #f0f4f1;
         color: #315541;
@@ -197,6 +185,30 @@
     .cancel-btn { background: #eef2ef; color: #43564a; }
     .save-btn { background: #174b38; color: white; }
 
+    .alert-success {
+        background: #e8f5eb;
+        color: #24633b;
+        border: 1px solid #cce8d2;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+    .alert-error {
+        background: #fff0f0;
+        color: #a83232;
+        border: 1px solid #f1cccc;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+    .empty-row {
+        text-align: center;
+        color: #87928b;
+        padding: 35px !important;
+    }
+
     @media(max-width: 650px) {
         .category-summary { grid-template-columns: 1fr; }
         .category-panel { padding: 16px; }
@@ -210,18 +222,33 @@
         <p>Organize and manage the categories used for lost and found items.</p>
     </div>
 
+    @if (session('success'))
+        <div class="alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert-error">
+            <strong>Please check the following:</strong>
+            <ul style="margin: 7px 0 0 18px;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="category-summary">
         <div class="summary-card">
             <span>Total Categories</span>
-            <h2 id="totalCategories">6</h2>
+            <h2>{{ number_format($totalCategories) }}</h2>
         </div>
         <div class="summary-card">
-            <span>Active Categories</span>
-            <h2 id="activeCategories">6</h2>
+            <span>Categories with Items</span>
+            <h2>{{ number_format($categoriesWithItems) }}</h2>
         </div>
         <div class="summary-card">
-            <span>Inactive Categories</span>
-            <h2 id="inactiveCategories">0</h2>
+            <span>Categories without Items</span>
+            <h2>{{ number_format($categoriesWithoutItems) }}</h2>
         </div>
     </div>
 
@@ -234,7 +261,7 @@
                 </p>
             </div>
 
-            <button class="add-category-btn" onclick="openAddModal()">
+            <button type="button" class="add-category-btn" onclick="openAddModal()">
                 + Add Category
             </button>
         </div>
@@ -246,163 +273,139 @@
                         <th>Category</th>
                         <th>Description</th>
                         <th>Items</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="categoryTableBody">
-                    <tr>
-                        <td><div class="category-name"><span class="category-icon">📱</span> Electronics</div></td>
-                        <td>Phones, gadgets, and electronic devices</td>
-                        <td>24</td>
-                        <td><span class="category-status">Active</span></td>
-                        <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td><div class="category-name"><span class="category-icon">🎒</span> Bags</div></td>
-                        <td>Backpacks, handbags, and wallets</td>
-                        <td>18</td>
-                        <td><span class="category-status">Active</span></td>
-                        <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td><div class="category-name"><span class="category-icon">📚</span> Books</div></td>
-                        <td>Textbooks, notebooks, and reading materials</td>
-                        <td>12</td>
-                        <td><span class="category-status">Active</span></td>
-                        <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td><div class="category-name"><span class="category-icon">👕</span> Clothing</div></td>
-                        <td>Jackets, uniforms, and other clothing</td>
-                        <td>9</td>
-                        <td><span class="category-status">Active</span></td>
-                        <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td><div class="category-name"><span class="category-icon">🔑</span> Accessories</div></td>
-                        <td>Keys, watches, jewelry, and accessories</td>
-                        <td>15</td>
-                        <td><span class="category-status">Active</span></td>
-                        <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td><div class="category-name"><span class="category-icon">📄</span> Documents</div></td>
-                        <td>IDs, school documents, and certificates</td>
-                        <td>7</td>
-                        <td><span class="category-status">Active</span></td>
-                        <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-                    </tr>
+                <tbody>
+                    @forelse ($categories as $category)
+                        <tr>
+                            <td>
+                                <div class="category-name">
+                                    <span class="category-icon">📦</span>
+                                    {{ $category->name }}
+                                </div>
+                            </td>
+                            <td>{{ $category->description ?: 'No description provided' }}</td>
+                            <td>{{ number_format($category->items_count) }}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="action-btn"
+                                    onclick="openEditModal(
+                                        {{ $category->id }},
+                                        @js($category->name),
+                                        @js($category->description)
+                                    )"
+                                >Edit</button>
+
+                                <form
+                                    method="POST"
+                                    action="{{ route('admin.categories.destroy', $category->id) }}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Delete {{ addslashes($category->name) }}? Existing item reports will be preserved, but their category will be cleared.')"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="action-btn delete-btn">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="empty-row">
+                                No categories have been added yet.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Add / Edit Modal -->
 <div class="category-modal" id="categoryModal">
     <div class="modal-content">
         <h3 id="modalTitle">Add Category</h3>
 
-        <form id="categoryForm">
+        <form id="categoryForm" method="POST" action="{{ route('admin.categories.store') }}">
+            @csrf
+
+            <input type="hidden" id="formMethod" name="_method" value="POST">
+
             <div class="form-group">
                 <label for="categoryName">Category Name</label>
-                <input type="text" id="categoryName" required placeholder="Enter category name">
+                <input
+                    type="text"
+                    id="categoryName"
+                    name="name"
+                    maxlength="100"
+                    required
+                    placeholder="Enter category name"
+                    value="{{ old('name') }}"
+                >
             </div>
 
             <div class="form-group">
                 <label for="categoryDescription">Description</label>
-                <textarea id="categoryDescription" rows="3" placeholder="Enter category description"></textarea>
+                <textarea
+                    id="categoryDescription"
+                    name="description"
+                    rows="3"
+                    maxlength="2000"
+                    placeholder="Enter category description"
+                >{{ old('description') }}</textarea>
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="save-btn">Save Category</button>
+                <button type="button" class="cancel-btn" onclick="closeModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="save-btn">
+                    Save Category
+                </button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    let editingRow = null;
-
-    function updateCounts() {
-        const rows = document.querySelectorAll('#categoryTableBody tr');
-        document.getElementById('totalCategories').textContent = rows.length;
-        document.getElementById('activeCategories').textContent = rows.length;
-        document.getElementById('inactiveCategories').textContent = 0;
-    }
+    const categoryModal = document.getElementById('categoryModal');
+    const categoryForm = document.getElementById('categoryForm');
+    const formMethod = document.getElementById('formMethod');
 
     function openAddModal() {
-        editingRow = null;
         document.getElementById('modalTitle').textContent = 'Add Category';
-        document.getElementById('categoryForm').reset();
-        document.getElementById('categoryModal').classList.add('show');
+        categoryForm.action = @json(route('admin.categories.store'));
+        formMethod.value = 'POST';
+        document.getElementById('categoryName').value = '';
+        document.getElementById('categoryDescription').value = '';
+        categoryModal.classList.add('show');
+    }
+
+    function openEditModal(id, name, description) {
+        document.getElementById('modalTitle').textContent = 'Edit Category';
+        categoryForm.action = @json(url('/admin/categories')) + '/' + id;
+        formMethod.value = 'PUT';
+        document.getElementById('categoryName').value = name || '';
+        document.getElementById('categoryDescription').value = description || '';
+        categoryModal.classList.add('show');
     }
 
     function closeModal() {
-        document.getElementById('categoryModal').classList.remove('show');
+        categoryModal.classList.remove('show');
     }
 
-    function editCategory(button) {
-        editingRow = button.closest('tr');
-        const name = editingRow.querySelector('.category-name').textContent.trim();
-        const description = editingRow.cells[1].textContent.trim();
-
-        document.getElementById('modalTitle').textContent = 'Edit Category';
-        document.getElementById('categoryName').value = name;
-        document.getElementById('categoryDescription').value = description;
-        document.getElementById('categoryModal').classList.add('show');
-    }
-
-    function deleteCategory(button) {
-        if (confirm('Are you sure you want to delete this sample category?')) {
-            button.closest('tr').remove();
-            updateCounts();
+    categoryModal.addEventListener('click', function(event) {
+        if (event.target === categoryModal) {
+            closeModal();
         }
-    }
-
-    document.getElementById('categoryForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const name = document.getElementById('categoryName').value.trim();
-        const description = document.getElementById('categoryDescription').value.trim();
-
-        if (!name) return;
-
-        if (editingRow) {
-            editingRow.querySelector('.category-name').innerHTML =
-                '<span class="category-icon">📦</span> ' + escapeHTML(name);
-            editingRow.cells[1].textContent = description || 'No description provided';
-        } else {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><div class="category-name"><span class="category-icon">📦</span> ${escapeHTML(name)}</div></td>
-                <td>${escapeHTML(description || 'No description provided')}</td>
-                <td>0</td>
-                <td><span class="category-status">Active</span></td>
-                <td><button class="action-btn" onclick="editCategory(this)">Edit</button><button class="action-btn delete-btn" onclick="deleteCategory(this)">Delete</button></td>
-            `;
-            document.getElementById('categoryTableBody').appendChild(row);
-        }
-
-        closeModal();
-        updateCounts();
     });
 
-    function escapeHTML(value) {
-        return value.replace(/[&<>"']/g, function(character) {
-            return {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            }[character];
-        });
-    }
-
-    updateCounts();
+    @if ($errors->any())
+        categoryModal.classList.add('show');
+    @endif
 </script>
 
 @endsection

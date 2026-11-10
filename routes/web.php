@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\AuthController;
@@ -97,9 +98,20 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
         ->whereNumber('student')
         ->name('admin.students.password');
 
-    // Other Admin Pages
-    Route::view('/admin/categories', 'admin.categories')
-        ->name('admin.categories');
+    // Manage Categories
+Route::get('/admin/categories', [CategoryController::class, 'index'])
+    ->name('admin.categories');
+
+Route::post('/admin/categories', [CategoryController::class, 'store'])
+    ->name('admin.categories.store');
+
+Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])
+    ->whereNumber('category')
+    ->name('admin.categories.update');
+
+Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])
+    ->whereNumber('category')
+    ->name('admin.categories.destroy');
 });
 
 // Student Routes
