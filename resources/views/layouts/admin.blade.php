@@ -17,6 +17,7 @@
     </style>
 </head>
 <body class="min-h-screen">
+    @php($profilePhotoUrl = app(\App\Services\SupabaseStorageService::class)->url(auth()->user()->profile_photo_path))
     <div class="min-h-screen md:flex">
         <aside class="w-full bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
@@ -56,7 +57,13 @@
                         @endif
                     </a>
                     <span class="hidden text-sm font-semibold text-gray-700 sm:inline">{{ auth()->user()->name }}</span>
-                    <div class="grid h-10 w-10 place-items-center rounded-full bg-[#e8eee9] font-bold text-[#174b38]">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
+                    <div class="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-[#e8eee9] font-bold text-[#174b38]">
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                        @else
+                            {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
+                        @endif
+                    </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:border-[#174b38] hover:text-[#174b38]">Sign out</button>

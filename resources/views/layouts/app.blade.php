@@ -83,6 +83,7 @@
 </head>
 
 <body class="min-h-screen">
+    @php($profilePhotoUrl = app(\App\Services\SupabaseStorageService::class)->url(auth()->user()->profile_photo_path))
 
     @if (session('success'))<div hidden data-ui-toast data-kind="success">{{ session('success') }}</div>@endif
     @if (session('error'))<div hidden data-ui-toast data-kind="error">{{ session('error') }}</div>@endif
@@ -148,7 +149,13 @@
 
             <div class="border-t border-white/10 p-4">
                 <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-                    <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d7b65d] font-bold text-[#173c2d]">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
+                    <div class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[#d7b65d] font-bold text-[#173c2d]">
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                        @else
+                            {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
+                        @endif
+                    </div>
                     <div class="min-w-0">
                         <p class="truncate text-xs font-semibold text-white">{{ auth()->user()->name }}</p>
                         <p class="mt-1 text-[10px] text-green-100/70">Administrator</p>
@@ -229,8 +236,12 @@
                         </p>
                     </div>
 
-                    <a href="{{ route('admin.profile') }}" title="View admin profile" aria-label="View admin profile" class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8eee9] font-bold text-[#174b38] transition hover:bg-[#d7e4dc] focus:outline-none focus:ring-2 focus:ring-[#174b38] focus:ring-offset-2">
-                        {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
+                    <a href="{{ route('admin.profile') }}" title="View admin profile" aria-label="View admin profile" class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[#e8eee9] font-bold text-[#174b38] transition hover:bg-[#d7e4dc] focus:outline-none focus:ring-2 focus:ring-[#174b38] focus:ring-offset-2">
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                        @else
+                            {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
+                        @endif
                     </a>
 
                 </div>

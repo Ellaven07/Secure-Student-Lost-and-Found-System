@@ -17,6 +17,7 @@
 </head>
 
 <body class="min-h-screen bg-[#f6f8f6] font-['Poppins'] text-gray-800 antialiased">
+    @php($profilePhotoUrl = app(\App\Services\SupabaseStorageService::class)->url(auth()->user()->profile_photo_path))
 
     <div class="min-h-screen md:flex">
 
@@ -114,8 +115,12 @@
             <!-- Student Account and Logout -->
             <div class="border-t border-white/10 px-5 py-4">
                 <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#d7b65d] bg-white text-sm font-bold text-[#174b38]">
-                        {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                    <div class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d7b65d] bg-white text-sm font-bold text-[#174b38]">
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                        @else
+                            {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                        @endif
                     </div>
 
                     <div class="min-w-0">
@@ -204,8 +209,12 @@
                             <p class="text-[10px] text-gray-400">My Profile</p>
                         </div>
 
-                        <div class="grid h-9 w-9 place-items-center rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38] transition group-hover:bg-[#dce9df]">
-                            {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                        <div class="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38] transition group-hover:bg-[#dce9df]">
+                            @if ($profilePhotoUrl)
+                                <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                            @else
+                                {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                            @endif
                         </div>
                     </a>
                 </div>
