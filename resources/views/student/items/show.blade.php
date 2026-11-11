@@ -1,11 +1,15 @@
-@extends('layouts.student')
+@extends(auth()->user()->isVisitor() ? 'layouts.visitor' : 'layouts.student')
 
 @section('title', 'Item Details')
 @section('page-label', 'Item Details')
 
 @section('content')
+@php
+    $browseRoutePrefix = $isVisitor ? 'visitor' : 'student';
+@endphp
+
 <div class="mx-auto max-w-4xl space-y-5">
-    <a href="{{ route('student.items.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#28634c] hover:text-[#174b38]">← Back to browse items</a>
+    <a href="{{ route($browseRoutePrefix.'.items.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#28634c] hover:text-[#174b38]">← Back to browse items</a>
     <article class="overflow-hidden rounded-2xl border border-[#e4eae6] bg-white shadow-sm">
         @if ($item->photo_path)
             <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="max-h-[440px] w-full bg-[#edf4ef] object-contain">
@@ -27,7 +31,9 @@
                 <div><dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ strtolower($item->type) === 'lost' ? 'Last seen location' : 'Found at' }}</dt><dd class="mt-1 text-sm font-semibold text-gray-700">{{ $item->location ?: 'Not provided' }}</dd></div>
                 <div><dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Date {{ strtolower($item->type) }}</dt><dd class="mt-1 text-sm font-semibold text-gray-700">{{ $item->date_lost_or_found ? \Illuminate\Support\Carbon::parse($item->date_lost_or_found)->format('F j, Y') : 'Not provided' }}</dd></div>
             </dl>
-            @if ($canClaim)
+            @if ($isVisitor)
+                <div class="rounded-xl border border-[#dce9df] bg-[#edf4ef] px-4 py-3 text-sm text-[#174b38]">Visitor access is limited to browsing items.</div>
+            @elseif ($canClaim)
                 <a href="{{ route('student.claims.create', $item->id) }}" class="inline-flex w-full items-center justify-center rounded-lg bg-[#174b38] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#103b2b] sm:w-auto">Submit a claim request</a>
             @elseif ($hasExistingClaim)
                 <div class="rounded-xl border border-[#dce9df] bg-[#edf4ef] px-4 py-3 text-sm text-[#174b38]">You already have a pending or approved claim for this item. <a href="{{ route('student.claims.index') }}" class="font-bold underline">View claim status</a></div>

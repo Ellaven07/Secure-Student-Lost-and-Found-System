@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->role === 'student';
     }
 
+    public function isVisitor(): bool
+    {
+        return $this->role === 'visitor';
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

@@ -87,6 +87,8 @@ class ItemBrowseController extends Controller
 
     public function show(Request $request, int $item): View
     {
+        $user = $request->user();
+
         $report = DB::table('items')
             ->join('users', 'users.id', '=', 'items.user_id')
             ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
@@ -108,17 +110,20 @@ class ItemBrowseController extends Controller
             ->whereRaw('LOWER(status) = ?', ['approved'])
             ->exists();
 
-        $hasExistingClaim = DB::table('claims')
-            ->where('item_id', $report->id)
-            ->where('claimant_id', $request->user()->id)
-            ->whereIn(DB::raw('LOWER(status)'), ['pending', 'approved'])
-            ->exists();
+        $hasExistingClaim = $user->isStudent()
+            && DB::table('claims')
+                ->where('item_id', $report->id)
+                ->where('claimant_id', $user->id)
+                ->whereIn(DB::raw('LOWER(status)'), ['pending', 'approved'])
+                ->exists();
 
         return view('student.items.show', [
             'item' => $report,
-            'canClaim' => strtolower($report->type) === 'found'
+            'isVisitor' => $user->isVisitor(),
+            'canClaim' => $user->isStudent()
+                && strtolower($report->type) === 'found'
                 && strtolower($report->status) === 'open'
-                && (int) $report->user_id !== (int) $request->user()->id
+                && (int) $report->user_id !== (int) $user->id
                 && ! $hasApprovedClaim
                 && ! $hasExistingClaim,
             'hasExistingClaim' => $hasExistingClaim,

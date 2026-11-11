@@ -33,7 +33,7 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        if (! $user instanceof User || ! $user->isActive() || (! $user->isAdmin() && ! $user->isStudent())) {
+        if (! $user instanceof User || ! $user->isActive() || (! $user->isAdmin() && ! $user->isStudent() && ! $user->isVisitor())) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -45,7 +45,13 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route($user->isAdmin() ? 'admin.dashboard' : 'student.dashboard');
+        $destination = match (true) {
+            $user->isAdmin() => 'admin.dashboard',
+            $user->isStudent() => 'student.dashboard',
+            default => 'visitor.items.index',
+        };
+
+        return redirect()->route($destination);
     }
 
     public function logout(Request $request): RedirectResponse

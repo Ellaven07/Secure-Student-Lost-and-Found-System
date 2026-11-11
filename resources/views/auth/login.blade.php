@@ -68,7 +68,7 @@
             <div class="form-wrap">
                 <div class="mobile-brand"><div class="brand-mark"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal"></div><div><strong>CAVITE STATE UNIVERSITY</strong><span>Student Lost &amp; Found</span></div></div>
                 <h2>Welcome back</h2>
-                <p class="form-intro">Sign in with your CvSU account to continue.</p>
+                <p class="form-intro">Sign in with your assigned account to continue.</p>
 
                 @if (session('status'))
                     <div class="notice" role="status">{{ session('status') }}</div>
@@ -92,7 +92,7 @@
                     </div>
                     <button class="submit" type="submit">Sign in to your account</button>
                 </form>
-                <p class="account-note">Student accounts are provided by the administrator.</p>
+                <p class="account-note">Students and administrators sign in with their assigned accounts. Visitors can sign in to browse verified items only.</p>
                 <p class="secure-note"><span aria-hidden="true">◆</span> Your account and information are protected.</p>
             </div>
         </section>
