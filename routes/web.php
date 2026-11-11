@@ -184,6 +184,18 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
     Route::get('/student/reports/history', [ItemReportController::class, 'history'])
         ->name('student.reports.history');
 
+    Route::get('/student/reports/{item}/edit', [ItemReportController::class, 'edit'])
+        ->whereNumber('item')
+        ->name('student.reports.edit');
+
+    Route::put('/student/reports/{item}', [ItemReportController::class, 'update'])
+        ->whereNumber('item')
+        ->name('student.reports.update');
+
+    Route::delete('/student/reports/{item}', [ItemReportController::class, 'destroy'])
+        ->whereNumber('item')
+        ->name('student.reports.destroy');
+
     Route::get('/student/items', [ItemBrowseController::class, 'index'])
         ->name('student.items.index');
 

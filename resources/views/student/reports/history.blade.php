@@ -72,7 +72,21 @@
                                 <span>{{ \Illuminate\Support\Carbon::parse($report->date_lost_or_found)->format('M j, Y') }}</span>
                             </div>
                         </div>
-                        <p class="shrink-0 text-xs text-gray-400">Submitted {{ \Illuminate\Support\Carbon::parse($report->created_at)->format('M j, Y') }}</p>
+                        <div class="flex shrink-0 flex-row items-center gap-2 sm:flex-col sm:items-end">
+                            <p class="text-xs text-gray-400">Submitted {{ \Illuminate\Support\Carbon::parse($report->created_at)->format('M j, Y') }}</p>
+                            @if ((int) $report->claims_count === 0 && ! in_array(strtolower($report->status), ['claimed', 'closed', 'resolved'], true))
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('student.reports.edit', $report->id) }}" class="rounded-md border border-[#dce9df] px-2.5 py-1.5 text-xs font-semibold text-[#28634c] transition hover:bg-[#edf4ef]">Edit</a>
+                                    <form method="POST" action="{{ route('student.reports.destroy', $report->id) }}" data-confirm="Delete this report? This cannot be undone." data-confirm-title="Delete report" data-confirm-label="Delete report" data-confirm-tone="danger">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50">Delete</button>
+                                    </form>
+                                </div>
+                            @else
+                                <span class="text-[11px] text-gray-400">Locked while a claim exists or the item is closed</span>
+                            @endif
+                        </div>
                     </article>
                 @endforeach
             </div>

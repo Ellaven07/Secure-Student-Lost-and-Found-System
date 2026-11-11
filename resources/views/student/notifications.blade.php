@@ -251,7 +251,7 @@
                     @method('PATCH')
                     <button type="submit" @disabled($unreadNotifications === 0)>Mark all as read</button>
                 </form>
-                <form method="POST" action="{{ route('notifications.clear') }}" onsubmit="return confirm('Clear all your notifications?')">
+                <form method="POST" action="{{ route('notifications.clear') }}" data-confirm="Clear all your notifications? This cannot be undone." data-confirm-title="Clear notifications" data-confirm-label="Clear all" data-confirm-tone="danger">
                     @csrf
                     @method('DELETE')
                     <button type="submit" @disabled($totalNotifications === 0)>Clear all</button>

@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class ItemReportController extends Controller
 {
@@ -40,7 +43,12 @@ class ItemReportController extends Controller
         $reportsQuery = DB::table('items')
             ->leftJoin('categories', 'items.category_id', '=', 'categories.id')
             ->where('items.user_id', $request->user()->id)
-            ->select('items.*', 'categories.name as category_name');
+            ->select('items.*', 'categories.name as category_name')
+            ->addSelect([
+                'claims_count' => DB::table('claims')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('claims.item_id', 'items.id'),
+            ]);
 
         if (! empty($validated['category_id'])) {
             $reportsQuery->where('items.category_id', $validated['category_id']);
@@ -65,6 +73,141 @@ class ItemReportController extends Controller
         $categories = DB::table('categories')->orderBy('name')->get(['id', 'name']);
 
         return view('student.reports.create', compact('categories', 'type'));
+    }
+
+    public function edit(Request $request, int $item): View
+    {
+        $report = $this->editableReport($item, (int) $request->user()->id);
+        $categories = DB::table('categories')->orderBy('name')->get(['id', 'name']);
+
+        return view('student.reports.edit', compact('report', 'categories'));
+    }
+
+    public function update(Request $request, int $item): RedirectResponse
+    {
+        $validated = $request->validate([
+            'item_name' => ['required', 'string', 'max:150'],
+            'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id')],
+            'description' => ['required', 'string', 'max:5000'],
+            'location' => ['required', 'string', 'max:255'],
+            'date_lost_or_found' => ['required', 'date', 'before_or_equal:today'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'remove_photo' => ['nullable', 'boolean'],
+        ]);
+
+        $newPhotoPath = $request->file('photo')?->store('item-reports', 'public');
+
+        if ($request->hasFile('photo') && ! $newPhotoPath) {
+            return back()->withInput()->withErrors([
+                'photo' => 'The photo could not be saved. Please try again.',
+            ]);
+        }
+
+        try {
+            $oldPhotoPath = DB::transaction(function () use ($item, $request, $validated, $newPhotoPath): ?string {
+                $report = DB::table('items')
+                    ->where('id', $item)
+                    ->where('user_id', $request->user()->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                abort_unless($report, 404);
+                $this->ensureReportCanChange($report);
+
+                $updates = [
+                    'category_id' => $validated['category_id'] ?? null,
+                    'item_name' => $validated['item_name'],
+                    'description' => $validated['description'],
+                    'location' => $validated['location'],
+                    'date_lost_or_found' => $validated['date_lost_or_found'],
+                    'status' => 'open',
+                    'is_verified' => false,
+                    'updated_at' => now(),
+                ];
+
+                if ($newPhotoPath) {
+                    $updates['photo_path'] = $newPhotoPath;
+                } elseif ($request->boolean('remove_photo')) {
+                    $updates['photo_path'] = null;
+                }
+
+                DB::table('items')->where('id', $item)->update($updates);
+
+                return $report->photo_path !== ($updates['photo_path'] ?? $report->photo_path)
+                    ? $report->photo_path
+                    : null;
+            });
+        } catch (Throwable $exception) {
+            if ($newPhotoPath) {
+                Storage::disk('public')->delete($newPhotoPath);
+            }
+
+            throw $exception;
+        }
+
+        if ($oldPhotoPath) {
+            Storage::disk('public')->delete($oldPhotoPath);
+        }
+
+        return redirect()
+            ->route('student.reports.history')
+            ->with('success', 'Your report was updated and sent back for admin review.');
+    }
+
+    public function destroy(Request $request, int $item): RedirectResponse
+    {
+        $photoPath = DB::transaction(function () use ($item, $request): ?string {
+            $report = DB::table('items')
+                ->where('id', $item)
+                ->where('user_id', $request->user()->id)
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless($report, 404);
+            $this->ensureReportCanChange($report);
+
+            DB::table('items')->where('id', $item)->delete();
+
+            return $report->photo_path;
+        });
+
+        if ($photoPath) {
+            Storage::disk('public')->delete($photoPath);
+        }
+
+        return redirect()
+            ->route('student.reports.history')
+            ->with('success', 'Your report was deleted.');
+    }
+
+    private function editableReport(int $item, int $studentId): object
+    {
+        $report = DB::table('items')
+            ->where('id', $item)
+            ->where('user_id', $studentId)
+            ->first();
+
+        abort_unless($report, 404);
+        $this->ensureReportCanChange($report);
+
+        return $report;
+    }
+
+    private function ensureReportCanChange(object $report): void
+    {
+        if (in_array(strtolower($report->status), ['claimed', 'closed', 'resolved'], true)) {
+            throw ValidationException::withMessages([
+                'report' => 'This report can no longer be changed because it is closed.',
+            ]);
+        }
+
+        $hasClaims = DB::table('claims')->where('item_id', $report->id)->exists();
+
+        if ($hasClaims) {
+            throw ValidationException::withMessages([
+                'report' => 'This report can no longer be changed because it has claim requests.',
+            ]);
+        }
     }
 
     private function store(Request $request, string $type): RedirectResponse

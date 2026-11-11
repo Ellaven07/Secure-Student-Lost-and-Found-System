@@ -230,17 +230,8 @@
 
             <!-- Page content -->
             <main class="w-full flex-1 px-4 py-7 sm:px-7 lg:px-9">
-                @if (session('success'))
-                    <div class="mx-auto mb-5 max-w-6xl rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="mx-auto mb-5 max-w-6xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                        {{ session('error') }}
-                    </div>
-                @endif
+                @if (session('success'))<div hidden data-ui-toast data-kind="success">{{ session('success') }}</div>@endif
+                @if (session('error'))<div hidden data-ui-toast data-kind="error">{{ session('error') }}</div>@endif
 
                 @if ($errors->any())
                     <div class="mx-auto mb-5 max-w-6xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -261,6 +252,8 @@
             </footer>
         </div>
     </div>
+    <div id="uiToastRoot" class="ui-toast-root" aria-live="polite" aria-atomic="false"></div>
+    <div id="uiModalRoot"></div>
 
     <script>
         function toggleStudentSidebar() {

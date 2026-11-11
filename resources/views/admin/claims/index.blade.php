@@ -10,7 +10,6 @@
         <p class="mt-2 text-sm text-green-50/85">Check the claimant’s proof, then approve or reject the request with a note.</p>
     </section>
 
-    @if (session('success'))<div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>@endif
     @if ($errors->any())<div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>@endif
 
     <section class="grid gap-4 sm:grid-cols-3">
@@ -35,14 +34,14 @@
                 @if ($claim->remarks && strtolower($claim->status) !== 'pending')<p class="text-sm text-gray-500"><span class="font-semibold">Review note:</span> {{ $claim->remarks }}</p>@endif
                 @if (strtolower($claim->status) === 'pending')
                     <div class="grid gap-4 lg:grid-cols-2">
-                        <form method="POST" action="{{ route('admin.claims.approve', $claim->id) }}" class="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4" onsubmit="return confirm('Approve this claim? The item will be marked claimed and other pending claims will be declined.')">
+                        <form method="POST" action="{{ route('admin.claims.approve', $claim->id) }}" class="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4" data-confirm="Approve this claim? The item will be marked claimed and other pending claims will be declined." data-confirm-title="Approve claim request" data-confirm-label="Approve claim">
                             @csrf
                             @method('PATCH')
                             <label for="approve-remarks-{{ $claim->id }}" class="block text-xs font-semibold text-gray-600">Note to claimant <span class="font-normal text-gray-400">(optional)</span></label>
                             <textarea id="approve-remarks-{{ $claim->id }}" name="remarks" maxlength="2000" rows="2" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#56846b]" placeholder="Add pickup instructions or other information."></textarea>
                             <button type="submit" class="w-full rounded-lg bg-[#174b38] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#103b2b]">Approve claim</button>
                         </form>
-                        <form method="POST" action="{{ route('admin.claims.reject', $claim->id) }}" class="space-y-2 rounded-xl border border-red-200 bg-red-50/50 p-4" onsubmit="return confirm('Reject this claim and send the note to the student?')">
+                        <form method="POST" action="{{ route('admin.claims.reject', $claim->id) }}" class="space-y-2 rounded-xl border border-red-200 bg-red-50/50 p-4" data-confirm="Reject this claim and send the note to the student?" data-confirm-title="Reject claim request" data-confirm-label="Reject claim" data-confirm-tone="danger">
                             @csrf
                             @method('PATCH')
                             <label for="reject-remarks-{{ $claim->id }}" class="block text-xs font-semibold text-gray-600">Reason for rejection <span class="text-red-600">*</span></label>

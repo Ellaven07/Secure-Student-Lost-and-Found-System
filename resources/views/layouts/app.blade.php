@@ -83,6 +83,9 @@
 
 <body class="min-h-screen">
 
+    @if (session('success'))<div hidden data-ui-toast data-kind="success">{{ session('success') }}</div>@endif
+    @if (session('error'))<div hidden data-ui-toast data-kind="error">{{ session('error') }}</div>@endif
+
     <div class="min-h-screen md:flex">
 
         <aside class="w-full overflow-y-auto bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
@@ -239,6 +242,9 @@
         </div>
 
     </div>
+
+    <div id="uiToastRoot" class="ui-toast-root" aria-live="polite" aria-atomic="false"></div>
+    <div id="uiModalRoot"></div>
 
 
 </body>

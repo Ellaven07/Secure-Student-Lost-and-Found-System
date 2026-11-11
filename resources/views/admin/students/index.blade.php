@@ -140,18 +140,6 @@
         <p>View, register, and monitor student accounts.</p>
     </div>
 
-    @if (session('success'))
-        <div class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {{ session('error') }}
-        </div>
-    @endif
-
     <section class="stats-section">
         <div class="stat-item">
             <div class="stat-icon">#</div>
@@ -293,7 +281,7 @@
 
                                     <form action="{{ route('admin.students.status', $student) }}"
                                           method="POST"
-                                          onsubmit="return confirm('Are you sure you want to change this account status?');">
+                                          data-confirm="Change this student's account status?" data-confirm-title="Change account status" data-confirm-label="Continue">
                                         @csrf
                                         @method('PATCH')
 
@@ -305,7 +293,7 @@
 
                                     <form action="{{ route('admin.students.destroy', $student) }}"
                                           method="POST"
-                                          onsubmit="return confirm('Delete this student account? This action cannot be undone.');">
+                                          data-confirm="Delete this student account? This action cannot be undone." data-confirm-title="Delete student account" data-confirm-label="Delete account" data-confirm-tone="danger">
                                         @csrf
                                         @method('DELETE')
 

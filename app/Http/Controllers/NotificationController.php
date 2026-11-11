@@ -43,7 +43,7 @@ class NotificationController extends Controller
                 'updated_at' => now(),
             ]);
 
-        return back();
+        return back()->with('success', 'Notification marked as read.');
     }
 
     public function markAllAsRead(Request $request): RedirectResponse
@@ -56,7 +56,7 @@ class NotificationController extends Controller
                 'updated_at' => now(),
             ]);
 
-        return back();
+        return back()->with('success', 'All notifications marked as read.');
     }
 
     public function clear(Request $request): RedirectResponse
@@ -65,6 +65,6 @@ class NotificationController extends Controller
             ->where('user_id', $request->user()->getAuthIdentifier())
             ->delete();
 
-        return back();
+        return back()->with('success', 'Notifications cleared.');
     }
 }
