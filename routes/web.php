@@ -67,6 +67,15 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
     Route::get('/admin/dashboard/export', [AdminDashboardController::class, 'export'])
         ->name('admin.dashboard.export');
 
+    Route::get('/admin/activity-logs', [AdminDashboardController::class, 'activityLogs'])
+        ->name('admin.activity-logs.index');
+
+    Route::get('/admin/generate-reports', [AdminDashboardController::class, 'generateReports'])
+        ->name('admin.generate-reports.index');
+
+    Route::get('/admin/generate-reports/export', [AdminDashboardController::class, 'exportGeneratedReports'])
+        ->name('admin.generate-reports.export');
+
     Route::get('/admin/reports', [AdminReviewController::class, 'reports'])
         ->name('admin.reports.index');
 
