@@ -11,7 +11,7 @@
                 <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Dashboard overview</h1>
                 <p class="mt-3 max-w-2xl text-sm leading-6 text-green-50/85">Reports, claims, student activity, and items waiting for review.</p>
             </div>
-            <a href="{{ route('admin.dashboard.export') }}" class="inline-flex items-center rounded-lg bg-[#d7b65d] px-4 py-2.5 text-sm font-bold text-[#173c2d] transition hover:bg-[#e3c976]">Generate Reports</a>
+            <a href="{{ route('admin.generate-reports.index') }}" class="inline-flex items-center rounded-lg bg-[#d7b65d] px-4 py-2.5 text-sm font-bold text-[#173c2d] transition hover:bg-[#e3c976]">Generate Reports</a>
         </div>
     </section>
 
@@ -19,8 +19,8 @@
         <a href="{{ route('admin.reports.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Review Item Reports</a>
         <a href="{{ route('admin.claims.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Review Claim Requests</a>
         <a href="{{ route('admin.students.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Manage Student Accounts</a>
-        <a href="#recent-activity" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">View Activity Logs</a>
-        <a href="{{ route('admin.dashboard.export') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Generate Reports</a>
+        <a href="{{ route('admin.activity-logs.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">View Activity Logs</a>
+        <a href="{{ route('admin.generate-reports.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Generate Reports</a>
     </nav>
 
     <section aria-label="Admin page placeholders" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

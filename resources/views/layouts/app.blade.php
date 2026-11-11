@@ -131,8 +131,8 @@
                         <p class="px-10 pt-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Admin Pages</p>
                         <a href="{{ route('admin.claims.index') }}" class="submenu-link {{ request()->routeIs('admin.claims.*') ? 'active' : '' }}"><span>Claim Requests</span></a>
                         <a href="{{ route('admin.reports.index') }}" class="submenu-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"><span>All Reports</span></a>
-                        <a href="{{ route('admin.dashboard') }}#activity-logs-page" class="submenu-link"><span>Activity Logs</span></a>
-                        <a href="{{ route('admin.dashboard') }}#generate-print-reports-page" class="submenu-link"><span>Generate and Print Reports</span></a>
+                        <a href="{{ route('admin.activity-logs.index') }}" class="submenu-link {{ request()->routeIs('admin.activity-logs.*') ? 'active' : '' }}"><span>Activity Logs</span></a>
+                        <a href="{{ route('admin.generate-reports.index') }}" class="submenu-link {{ request()->routeIs('admin.generate-reports.*') ? 'active' : '' }}"><span>Generate and Print Reports</span></a>
                     </div>
                 </details>
 
