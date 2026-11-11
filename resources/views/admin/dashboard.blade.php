@@ -3,8 +3,8 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
-<div class="mx-auto max-w-7xl space-y-7">
-    <section class="overflow-hidden rounded-2xl bg-[#174b38] px-6 py-8 text-white shadow-sm sm:px-9 sm:py-9">
+<div class="mx-auto max-w-7xl space-y-5">
+    <section class="overflow-hidden rounded-2xl bg-[#174b38] px-6 py-6 text-white shadow-sm sm:px-9 sm:py-7">
         <p class="text-xs font-bold uppercase tracking-[.18em] text-[#e2c66f]">Administrator portal</p>
         <div class="mt-3 flex flex-wrap items-end justify-between gap-5">
             <div>
@@ -22,21 +22,6 @@
         <a href="{{ route('admin.activity-logs.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">View Activity Logs</a>
         <a href="{{ route('admin.generate-reports.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Generate Reports</a>
     </nav>
-
-    <section aria-label="Admin page placeholders" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article id="claim-requests-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-            <h2 class="text-base font-bold text-gray-800">Claim Requests</h2>
-        </article>
-        <article id="all-reports-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-            <h2 class="text-base font-bold text-gray-800">All Reports</h2>
-        </article>
-        <article id="activity-logs-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-            <h2 class="text-base font-bold text-gray-800">Activity Logs</h2>
-        </article>
-        <article id="generate-print-reports-page" class="scroll-mt-24 min-h-24 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
-            <h2 class="text-base font-bold text-gray-800">Generate and Print Reports</h2>
-        </article>
-    </section>
 
     <section id="report-charts" class="scroll-mt-24 space-y-4">
         <div>
