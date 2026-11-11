@@ -46,8 +46,8 @@
                 @error('description')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div class="sm:col-span-2">
-                <label for="photo" class="mb-2 block text-sm font-semibold text-gray-700">Photo <span class="font-normal text-gray-400">(optional, JPG/PNG/WEBP up to 5 MB)</span></label>
-                <input id="photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-gray-300 text-sm text-gray-600 file:mr-4 file:border-0 file:bg-[#edf4ef] file:px-4 file:py-3 file:text-sm file:font-semibold file:text-[#174b38] hover:file:bg-[#e1ebe4]">
+                <label for="photo" class="mb-2 block text-sm font-semibold text-gray-700">Photo <span class="font-normal text-gray-400">({{ $type === 'found' ? 'required' : 'optional' }}, JPG/PNG/WEBP up to 5 MB)</span></label>
+                <input id="photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" @required($type === 'found') class="block w-full rounded-lg border border-gray-300 text-sm text-gray-600 file:mr-4 file:border-0 file:bg-[#edf4ef] file:px-4 file:py-3 file:text-sm file:font-semibold file:text-[#174b38] hover:file:bg-[#e1ebe4]">
                 @error('photo')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
         </div>

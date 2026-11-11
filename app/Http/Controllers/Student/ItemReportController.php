@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,14 +22,14 @@ class ItemReportController extends Controller
         return $this->reportForm('found');
     }
 
-    public function storeLost(Request $request): RedirectResponse
+    public function storeLost(Request $request, SupabaseStorageService $photoStorage): RedirectResponse
     {
-        return $this->store($request, 'lost');
+        return $this->store($request, 'lost', $photoStorage);
     }
 
-    public function storeFound(Request $request): RedirectResponse
+    public function storeFound(Request $request, SupabaseStorageService $photoStorage): RedirectResponse
     {
-        return $this->store($request, 'found');
+        return $this->store($request, 'found', $photoStorage);
     }
 
     public function history(Request $request): View
@@ -67,7 +68,7 @@ class ItemReportController extends Controller
         return view('student.reports.create', compact('categories', 'type'));
     }
 
-    private function store(Request $request, string $type): RedirectResponse
+    private function store(Request $request, string $type, SupabaseStorageService $photoStorage): RedirectResponse
     {
         $validated = $request->validate([
             'item_name' => ['required', 'string', 'max:150'],
@@ -75,10 +76,22 @@ class ItemReportController extends Controller
             'description' => ['required', 'string', 'max:5000'],
             'location' => ['required', 'string', 'max:255'],
             'date_lost_or_found' => ['required', 'date', 'before_or_equal:today'],
-            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'photo' => [$type === 'found' ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        $photoPath = $request->file('photo')?->store('item-reports', 'public');
+        $missingSettings = $photoStorage->missingItemConfiguration();
+
+        if ($request->hasFile('photo') && $missingSettings !== []) {
+            $missingSettings = implode(', ', $missingSettings);
+
+            return back()->withInput()->withErrors([
+                'photo' => "Item photo storage is missing server setting(s): {$missingSettings}. Configure Supabase Storage and restart the server.",
+            ]);
+        }
+
+        $photoPath = $request->file('photo')
+            ? $photoStorage->uploadItemPhoto($request->file('photo'), $request->user()->id)
+            : null;
 
         if ($request->hasFile('photo') && ! $photoPath) {
             return back()->withInput()->withErrors([

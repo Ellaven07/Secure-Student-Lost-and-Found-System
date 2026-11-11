@@ -71,6 +71,53 @@ class SupabaseStorageService
         return 'supabase/'.$objectPath;
     }
 
+    /**
+     * @return array<int, string>
+     */
+    public function missingItemConfiguration(): array
+    {
+        return $this->missingConfiguration();
+    }
+
+    public function uploadItemPhoto(UploadedFile $photo, int $studentId): ?string
+    {
+        if (! $this->isConfigured()) {
+            return null;
+        }
+
+        $objectPath = 'item-reports/'.$studentId.'/'.Str::uuid().'.'.$photo->extension();
+
+        try {
+            $response = $this->authorizedRequest()
+                ->withHeaders([
+                    'Content-Type' => $photo->getMimeType() ?: 'application/octet-stream',
+                    'x-upsert' => 'false',
+                    'cache-control' => 'max-age=3600',
+                ])
+                ->withBody($photo->getContent(), $photo->getMimeType() ?: 'application/octet-stream')
+                ->post($this->objectUrl($objectPath));
+        } catch (ConnectionException $exception) {
+            Log::warning('Supabase item photo upload could not connect.', [
+                'error' => Str::limit($exception->getMessage(), 300),
+            ]);
+
+            return null;
+        }
+
+        if (! $response->successful()) {
+            Log::warning('Supabase item photo upload failed.', [
+                'status' => $response->status(),
+                'error' => $response->json('message')
+                    ?? $response->json('error')
+                    ?? 'Supabase did not return an error message.',
+            ]);
+
+            return null;
+        }
+
+        return 'supabase-shared-items/'.$objectPath;
+    }
+
     public function url(?string $path): ?string
     {
         if (! $path) {
@@ -89,6 +136,30 @@ class SupabaseStorageService
                 .'/storage/v1/object/public/'.$bucket.'/'.$this->encodedPath($objectPath);
         }
 
+        if (Str::startsWith($path, 'supabase-items/')) {
+            if ($this->missingItemConfiguration() !== []) {
+                return null;
+            }
+
+            $objectPath = Str::after($path, 'supabase-items/');
+            $bucket = rawurlencode(config('services.supabase.items_bucket'));
+
+            return rtrim(config('services.supabase.url'), '/')
+                .'/storage/v1/object/public/'.$bucket.'/'.$this->encodedPath($objectPath);
+        }
+
+        if (Str::startsWith($path, 'supabase-shared-items/')) {
+            if (! $this->isConfigured()) {
+                return null;
+            }
+
+            $objectPath = Str::after($path, 'supabase-shared-items/');
+            $bucket = rawurlencode(config('services.supabase.storage_bucket'));
+
+            return rtrim(config('services.supabase.url'), '/')
+                .'/storage/v1/object/public/'.$bucket.'/'.$this->encodedPath($objectPath);
+        }
+
         return Storage::disk('public')->exists($path)
             ? asset('storage/'.$path)
             : null;
@@ -100,22 +171,33 @@ class SupabaseStorageService
             return;
         }
 
-        if (! Str::startsWith($path, 'supabase/')) {
+        if (! Str::startsWith($path, ['supabase/', 'supabase-items/', 'supabase-shared-items/'])) {
             Storage::disk('public')->delete($path);
 
             return;
         }
 
-        if (! $this->isConfigured()) {
+        $isItemPhoto = Str::startsWith($path, 'supabase-items/');
+        $isSharedItemPhoto = Str::startsWith($path, 'supabase-shared-items/');
+        $pathPrefix = match (true) {
+            $isSharedItemPhoto => 'supabase-shared-items/',
+            $isItemPhoto => 'supabase-items/',
+            default => 'supabase/',
+        };
+        $objectPath = Str::after($path, $pathPrefix);
+        $bucketName = $isItemPhoto
+            ? config('services.supabase.items_bucket')
+            : config('services.supabase.storage_bucket');
+
+        if (($isItemPhoto && $this->missingItemConfiguration() !== [])
+            || (! $isItemPhoto && ! $this->isConfigured())) {
             return;
         }
-
-        $objectPath = Str::after($path, 'supabase/');
 
         try {
             $response = $this->authorizedRequest()->delete(
                 rtrim(config('services.supabase.url'), '/').'/storage/v1/object/'
-                    .rawurlencode(config('services.supabase.storage_bucket')),
+                    .rawurlencode($bucketName),
                 ['prefixes' => [$objectPath]],
             );
 

@@ -13,7 +13,7 @@
 
     <section class="flex gap-4 rounded-2xl border border-[#e4eae6] bg-white p-5 shadow-sm">
         @if ($item->photo_path)
-            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="h-20 w-20 shrink-0 rounded-xl object-cover">
+            <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="h-20 w-20 shrink-0 rounded-xl object-cover">
         @else
             <div class="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-[#edf4ef] text-2xl text-[#28634c]" aria-hidden="true">+</div>
         @endif
