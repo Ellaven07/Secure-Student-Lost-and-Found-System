@@ -90,7 +90,7 @@
 
     <div class="min-h-screen md:flex">
 
-        <aside class="w-full overflow-y-auto bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
+        <aside class="w-full overflow-y-auto bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:h-screen md:w-64 md:flex-col">
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-6">
                 <div class="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white p-0.5"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal" class="h-full w-full object-contain"></div>
                 <div class="min-w-0">
@@ -148,7 +148,7 @@
             </nav>
 
             <div class="border-t border-white/10 p-4">
-                <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
+                <a href="{{ route('admin.profile') }}" class="flex items-center gap-3 rounded-xl bg-white/5 p-3 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#d7b65d]" aria-label="View administrator profile">
                     <div class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[#d7b65d] font-bold text-[#173c2d]">
                         @if ($profilePhotoUrl)
                             <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
@@ -160,11 +160,12 @@
                         <p class="truncate text-xs font-semibold text-white">{{ auth()->user()->name }}</p>
                         <p class="mt-1 text-[10px] text-green-100/70">Administrator</p>
                     </div>
-                </div>
+                    <svg class="ml-auto h-4 w-4 shrink-0 text-green-100/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m9 18 6-6-6-6" /></svg>
+                </a>
             </div>
         </aside>
 
-        <div class="min-w-0 flex-1 md:ml-64">
+        <div class="flex min-h-screen min-w-0 flex-1 flex-col md:ml-64">
 
             <header class="sticky top-0 z-10 flex min-h-[72px] items-center justify-between border-b border-gray-200 bg-white px-5 py-4 shadow-sm sm:px-8">
 
@@ -178,7 +179,7 @@
                     </h2>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
 
                     
 
@@ -212,13 +213,27 @@
 </a>
 
 
+                    <a href="{{ route('admin.profile') }}" title="View admin profile" aria-label="View admin profile" class="flex items-center gap-2 rounded-xl px-1.5 py-1 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#174b38] focus:ring-offset-2 sm:gap-3 sm:px-2">
+                        <span class="hidden text-right sm:block">
+                            <span class="block max-w-40 truncate text-sm font-semibold text-gray-800">{{ auth()->user()->name }}</span>
+                            <span class="mt-0.5 block text-xs text-gray-500">Administrator</span>
+                        </span>
+                        <span class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[#e8eee9] font-bold text-[#174b38]">
+                            @if ($profilePhotoUrl)
+                                <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                            @else
+                                {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
+                            @endif
+                        </span>
+                    </a>
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button
                             type="submit"
                             title="Sign out"
                             aria-label="Sign out"
-                            class="flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                            class="flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 px-2.5 text-sm font-semibold text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 sm:px-3"
                         >
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5m5 5H3" />
@@ -227,32 +242,15 @@
                         </button>
                     </form>
 
-                    <div class="hidden text-right sm:block">
-                        <p class="text-sm font-semibold text-gray-800">
-                            {{ auth()->user()->name }}
-                        </p>
-                        <p class="text-xs text-gray-500">
-                            Administrator
-                        </p>
-                    </div>
-
-                    <a href="{{ route('admin.profile') }}" title="View admin profile" aria-label="View admin profile" class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[#e8eee9] font-bold text-[#174b38] transition hover:bg-[#d7e4dc] focus:outline-none focus:ring-2 focus:ring-[#174b38] focus:ring-offset-2">
-                        @if ($profilePhotoUrl)
-                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
-                        @else
-                            {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
-                        @endif
-                    </a>
-
                 </div>
 
             </header>
 
-            <main class="p-5 sm:p-8">
+            <main class="flex-1 p-5 sm:p-8">
                 @yield('content')
             </main>
 
-            <footer class="border-t border-gray-200 px-5 py-5 text-center text-xs text-gray-400 sm:px-8">
+            <footer class="mt-auto border-t border-gray-200 px-5 py-4 text-center text-xs text-gray-400 sm:px-8">
                 &copy; {{ date('Y') }} Cavite State University Student Lost & Found System. All rights reserved.
             </footer>
 
