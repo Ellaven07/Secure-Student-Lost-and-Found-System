@@ -3,9 +3,12 @@
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\StudentController;
-use App\Http\Controllers\Student\StudentProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Student\ClaimController;
+use App\Http\Controllers\Student\ItemBrowseController;
+use App\Http\Controllers\Student\ItemReportController;
+use App\Http\Controllers\Student\StudentProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage
@@ -139,4 +142,40 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
 
     Route::get('/student/notifications', [NotificationController::class, 'index'])
         ->name('student.notifications');
+
+    Route::get('/student/reports/lost', [ItemReportController::class, 'createLost'])
+        ->name('student.reports.lost.create');
+
+    Route::post('/student/reports/lost', [ItemReportController::class, 'storeLost'])
+        ->middleware('throttle:10,1')
+        ->name('student.reports.lost.store');
+
+    Route::get('/student/reports/found', [ItemReportController::class, 'createFound'])
+        ->name('student.reports.found.create');
+
+    Route::post('/student/reports/found', [ItemReportController::class, 'storeFound'])
+        ->middleware('throttle:10,1')
+        ->name('student.reports.found.store');
+
+    Route::get('/student/reports/history', [ItemReportController::class, 'history'])
+        ->name('student.reports.history');
+
+    Route::get('/student/items', [ItemBrowseController::class, 'index'])
+        ->name('student.items.index');
+
+    Route::get('/student/items/{item}', [ItemBrowseController::class, 'show'])
+        ->whereNumber('item')
+        ->name('student.items.show');
+
+    Route::get('/student/items/{item}/claim', [ClaimController::class, 'create'])
+        ->whereNumber('item')
+        ->name('student.claims.create');
+
+    Route::post('/student/items/{item}/claim', [ClaimController::class, 'store'])
+        ->whereNumber('item')
+        ->middleware('throttle:6,1')
+        ->name('student.claims.store');
+
+    Route::get('/student/claims', [ClaimController::class, 'index'])
+        ->name('student.claims.index');
 });

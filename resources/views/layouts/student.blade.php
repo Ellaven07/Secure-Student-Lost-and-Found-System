@@ -71,6 +71,31 @@
                         <span>Dashboard</span>
                     </a>
 
+                    <a href="{{ route('student.reports.lost.create') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs('student.reports.lost.*') ? 'border-l-[3px] border-[#d7b65d] bg-[#28634c] text-white' : 'text-green-100/80 hover:bg-[#28634c] hover:text-white' }}">
+                        <span class="grid h-5 w-5 shrink-0 place-items-center" aria-hidden="true">−</span>
+                        <span>Report Lost Item</span>
+                    </a>
+
+                    <a href="{{ route('student.reports.found.create') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs('student.reports.found.*') ? 'border-l-[3px] border-[#d7b65d] bg-[#28634c] text-white' : 'text-green-100/80 hover:bg-[#28634c] hover:text-white' }}">
+                        <span class="grid h-5 w-5 shrink-0 place-items-center" aria-hidden="true">+</span>
+                        <span>Report Found Item</span>
+                    </a>
+
+                    <a href="{{ route('student.reports.history') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs('student.reports.history') ? 'border-l-[3px] border-[#d7b65d] bg-[#28634c] text-white' : 'text-green-100/80 hover:bg-[#28634c] hover:text-white' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 2m6-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                        <span>My Report History</span>
+                    </a>
+
+                    <a href="{{ route('student.items.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs('student.items.*') || request()->routeIs('student.claims.create') ? 'border-l-[3px] border-[#d7b65d] bg-[#28634c] text-white' : 'text-green-100/80 hover:bg-[#28634c] hover:text-white' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-4.3-4.3M19 10.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0Z" /></svg>
+                        <span>Browse Items</span>
+                    </a>
+
+                    <a href="{{ route('student.claims.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition {{ request()->routeIs('student.claims.index') ? 'border-l-[3px] border-[#d7b65d] bg-[#28634c] text-white' : 'text-green-100/80 hover:bg-[#28634c] hover:text-white' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12.8 11.2 15 16 9.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                        <span>My Claim Status</span>
+                    </a>
+
                     <a
                         href="{{ route('student.profile') }}"
                         class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition
