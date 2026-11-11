@@ -119,9 +119,18 @@
                             <span>Manage Categories</span>
                         </a>
 
+                        <a href="{{ route('admin.reports.index') }}" class="submenu-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round' stroke-linejoin='round' stroke-width='1.8' d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01' /></svg>
+                            <span>Review Item Reports</span>
+                        </a>
+                        <a href="{{ route('admin.claims.index') }}" class="submenu-link {{ request()->routeIs('admin.claims.*') ? 'active' : '' }}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m5 12 4 4L19 6' /></svg>
+                            <span>Review Claim Requests</span>
+                        </a>
+
                         <p class="px-10 pt-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Admin Pages</p>
-                        <a href="{{ route('admin.dashboard') }}#claim-requests-page" class="submenu-link"><span>Claim Requests</span></a>
-                        <a href="{{ route('admin.dashboard') }}#all-reports-page" class="submenu-link"><span>All Reports</span></a>
+                        <a href="{{ route('admin.claims.index') }}" class="submenu-link {{ request()->routeIs('admin.claims.*') ? 'active' : '' }}"><span>Claim Requests</span></a>
+                        <a href="{{ route('admin.reports.index') }}" class="submenu-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"><span>All Reports</span></a>
                         <a href="{{ route('admin.dashboard') }}#activity-logs-page" class="submenu-link"><span>Activity Logs</span></a>
                         <a href="{{ route('admin.dashboard') }}#generate-print-reports-page" class="submenu-link"><span>Generate and Print Reports</span></a>
                     </div>

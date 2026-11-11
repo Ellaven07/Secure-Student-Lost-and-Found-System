@@ -53,6 +53,25 @@
             <span class="mt-5 inline-block text-sm font-bold text-[#28634c]">View notifications <span aria-hidden="true">→</span></span>
         </a>
     </section>
+    <section class="rounded-2xl border border-[#e4eae6] bg-white p-6 shadow-sm sm:p-7">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[.14em] text-[#9a8546]">Admin managed</p>
+                <h2 class="mt-1 text-lg font-bold text-[#174b38]">Available item categories</h2>
+                <p class="mt-1 text-sm text-gray-500">These categories are maintained by the administrator and can be selected when you submit a report.</p>
+            </div>
+            <span class="text-xs font-semibold text-gray-400">{{ $categories->count() }} {{ \Illuminate\Support\Str::plural('category', $categories->count()) }}</span>
+        </div>
+        @if ($categories->isEmpty())
+            <p class="mt-5 rounded-xl bg-[#f6f8f6] px-4 py-3 text-sm text-gray-500">No categories are available yet. Please check back later.</p>
+        @else
+            <div class="mt-5 flex flex-wrap gap-2">
+                @foreach ($categories as $category)
+                    <span class="rounded-full border border-[#dce9df] bg-[#edf4ef] px-3.5 py-2 text-sm font-semibold text-[#28634c]">{{ $category->name }}</span>
+                @endforeach
+            </div>
+        @endif
+    </section>
     <section class="rounded-2xl border border-[#e4eae6] bg-white p-6 shadow-sm">
         <p class="text-xs font-bold uppercase tracking-[.14em] text-[#9a8546]">Account</p>
         <p class="mt-2 text-sm text-gray-600">Signed in as <span class="font-semibold text-gray-800">{{ auth()->user()->email }}</span></p>

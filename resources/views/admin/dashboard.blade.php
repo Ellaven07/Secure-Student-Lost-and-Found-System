@@ -16,8 +16,8 @@
     </section>
 
     <nav aria-label="Dashboard actions" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <a href="#reports-by-category" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">View All Reports</a>
-        <a href="#pending-claims" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">View Claim Requests</a>
+        <a href="{{ route('admin.reports.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Review Item Reports</a>
+        <a href="{{ route('admin.claims.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Review Claim Requests</a>
         <a href="{{ route('admin.students.index') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Manage Student Accounts</a>
         <a href="#recent-activity" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">View Activity Logs</a>
         <a href="{{ route('admin.dashboard.export') }}" class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-bold text-[#28634c] shadow-sm transition hover:border-[#b8cfc0] hover:bg-[#f8fbf9]">Generate Reports</a>

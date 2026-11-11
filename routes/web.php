@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\AuthController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Student\ClaimController;
 use App\Http\Controllers\Student\ItemBrowseController;
 use App\Http\Controllers\Student\ItemReportController;
+use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +66,28 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
 
     Route::get('/admin/dashboard/export', [AdminDashboardController::class, 'export'])
         ->name('admin.dashboard.export');
+
+    Route::get('/admin/reports', [AdminReviewController::class, 'reports'])
+        ->name('admin.reports.index');
+
+    Route::patch('/admin/reports/{item}/verify', [AdminReviewController::class, 'verifyReport'])
+        ->whereNumber('item')
+        ->name('admin.reports.verify');
+
+    Route::patch('/admin/reports/{item}/reject', [AdminReviewController::class, 'rejectReport'])
+        ->whereNumber('item')
+        ->name('admin.reports.reject');
+
+    Route::get('/admin/claims', [AdminReviewController::class, 'claims'])
+        ->name('admin.claims.index');
+
+    Route::patch('/admin/claims/{claim}/approve', [AdminReviewController::class, 'approveClaim'])
+        ->whereNumber('claim')
+        ->name('admin.claims.approve');
+
+    Route::patch('/admin/claims/{claim}/reject', [AdminReviewController::class, 'rejectClaim'])
+        ->whereNumber('claim')
+        ->name('admin.claims.reject');
 
     Route::get('/admin/notifications', [NotificationController::class, 'index'])
         ->name('admin.notifications');
@@ -125,7 +149,7 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
 // Student Routes
 Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function () {
 
-    Route::view('/student/dashboard', 'student.dashboard')
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
         ->name('student.dashboard');
 
     Route::get('/student/profile', [StudentProfileController::class, 'show'])
