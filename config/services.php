@@ -35,6 +35,11 @@ return [
         'items_bucket' => env('SUPABASE_ITEM_BUCKET') ?: 'item-photos',
     ],
 
+    'visitor' => [
+        'email' => env('VISITOR_EMAIL', 'visitor@gmail.com'),
+        'password' => env('VISITOR_PASSWORD'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

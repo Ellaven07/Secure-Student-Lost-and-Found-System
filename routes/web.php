@@ -206,3 +206,12 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
     Route::get('/student/claims', [ClaimController::class, 'index'])
         ->name('student.claims.index');
 });
+
+Route::middleware(['auth', 'role:visitor', 'frontend-preview'])->prefix('visitor')->name('visitor.')->group(function () {
+    Route::get('/items', [ItemBrowseController::class, 'index'])
+        ->name('items.index');
+
+    Route::get('/items/{item}', [ItemBrowseController::class, 'show'])
+        ->whereNumber('item')
+        ->name('items.show');
+});
