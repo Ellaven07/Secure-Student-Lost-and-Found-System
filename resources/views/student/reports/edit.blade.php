@@ -52,7 +52,7 @@
                 <div class="sm:col-span-2">
                     <p class="mb-2 text-sm font-semibold text-gray-700">Current photo</p>
                     <div class="flex flex-wrap items-center gap-4">
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($report->photo_path) }}" alt="Current photo of {{ $report->item_name }}" class="h-24 w-24 rounded-xl border border-gray-100 object-cover">
+                        <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($report->photo_path) }}" alt="Current photo of {{ $report->item_name }}" class="h-24 w-24 rounded-xl border border-gray-100 object-cover">
                         <label class="flex items-center gap-2 text-sm text-gray-600"><input type="checkbox" name="remove_photo" value="1" @checked(old('remove_photo')) class="rounded border-gray-300 text-[#174b38] focus:ring-[#174b38]"> Remove current photo</label>
                     </div>
                 </div>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
     <title>@yield('title', 'Admin Dashboard') | CvSU Lost & Found</title>
 
@@ -90,7 +91,7 @@
 
         <aside class="w-full overflow-y-auto bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-6">
-                <div class="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">CvSU</div>
+                <div class="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white p-0.5"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal" class="h-full w-full object-contain"></div>
                 <div class="min-w-0">
                     <h1 class="truncate text-xs font-extrabold tracking-[.08em]">CAVITE STATE UNIVERSITY</h1>
                     <p class="mt-1 text-xs text-green-100">Student Lost &amp; Found</p>

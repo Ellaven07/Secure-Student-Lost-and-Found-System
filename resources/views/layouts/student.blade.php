@@ -3,6 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
     <title>@yield('title', 'Student Portal') | CvSU Lost & Found</title>
 
@@ -33,8 +34,8 @@
         >
             <!-- CvSU Branding -->
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">
-                    CvSU
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#d7b65d] bg-white p-0.5">
+                    <img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal" class="h-full w-full object-contain">
                 </div>
 
                 <div class="min-w-0">

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <title>Forgot password | CvSU Lost &amp; Found</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
 </head>
 <body>
     <main class="card">
-        <div class="mark">CvSU</div>
+        <div class="mark"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal" style="width:100%;height:100%;object-fit:contain;padding:3px"></div>
         <div class="eyebrow">Account recovery</div>
         <h1>Forgot your password?</h1>
         <p class="intro">Enter the email address linked to your account. We’ll send you a secure link to choose a new password.</p>
