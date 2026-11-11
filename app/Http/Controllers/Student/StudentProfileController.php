@@ -122,7 +122,7 @@ class StudentProfileController extends Controller
     }
 
     /**
-     * Change the student's password.
+     * Change the authenticated user's password.
      */
     public function updatePassword(Request $request): RedirectResponse
     {
@@ -135,16 +135,16 @@ class StudentProfileController extends Controller
             ],
         ]);
 
-        $student = $request->user();
+        $user = $request->user();
 
-        $student->update([
+        $user->update([
             'password' => $validated['password'],
         ]);
 
         $request->session()->regenerate();
 
         return redirect()
-            ->route('student.profile')
+            ->route($user->isAdmin() ? 'admin.profile' : 'student.profile')
             ->with('success', 'Your password has been changed successfully.');
     }
 }

@@ -95,6 +95,9 @@ Route::middleware(['auth', 'role:admin', 'frontend-preview'])->group(function ()
     Route::view('/admin/profile', 'admin.profile')
         ->name('admin.profile');
 
+    Route::put('/admin/profile/password', [StudentProfileController::class, 'updatePassword'])
+        ->name('admin.profile.password');
+
     // Student Management
     Route::get('/admin/students', [StudentController::class, 'index'])
         ->name('admin.students.index');

@@ -135,6 +135,11 @@
                         <a href="{{ route('admin.dashboard') }}#generate-print-reports-page" class="submenu-link"><span>Generate and Print Reports</span></a>
                     </div>
                 </details>
+
+                <a href="{{ route('admin.profile') }}" class="submenu-link mt-2 {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round' stroke-linejoin='round' stroke-width='1.8' d='M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-5v2m0 14v2m9-9h-2M5 12H3' /></svg>
+                    <span>Settings</span>
+                </a>
             </nav>
 
             <div class="border-t border-white/10 p-4">
