@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\View\View;
 
@@ -16,6 +17,59 @@ class AuthController extends Controller
     public function showLogin(): View
     {
         return view('auth.login');
+    }
+
+    public function showVisitorRegistration(): View
+    {
+        return view('auth.register-visitor');
+    }
+
+    public function registerVisitor(Request $request): RedirectResponse
+    {
+        $request->merge([
+            'email' => Str::lower((string) $request->input('email')),
+        ]);
+
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:80'],
+            'middle_name' => ['nullable', 'string', 'max:80'],
+            'last_name' => ['required', 'string', 'max:80'],
+            'phone_number' => ['required', 'string', 'max:30', 'regex:/^[0-9+().\-\s]{7,30}$/'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'regex:/^[^@\s]+@gmail\.com$/i',
+                Rule::unique('users', 'email'),
+            ],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
+        ], [
+            'email.regex' => 'Visitor accounts must use a Gmail address ending in @gmail.com.',
+        ]);
+
+        $visitor = User::create([
+            'name' => trim(implode(' ', array_filter([
+                $validated['first_name'],
+                $validated['middle_name'] ?? null,
+                $validated['last_name'],
+            ], fn (?string $namePart): bool => filled($namePart)))),
+            'first_name' => $validated['first_name'],
+            'middle_name' => $validated['middle_name'] ?? null,
+            'last_name' => $validated['last_name'],
+            'phone_number' => $validated['phone_number'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'role' => 'visitor',
+            'status' => 'active',
+        ]);
+
+        Auth::login($visitor);
+        $request->session()->regenerate();
+
+        return redirect()
+            ->route('visitor.items.index')
+            ->with('success', 'Your visitor account is ready. You can browse verified items.');
     }
 
     public function login(Request $request): RedirectResponse

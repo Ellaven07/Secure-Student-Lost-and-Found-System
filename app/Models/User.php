@@ -9,8 +9,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 #[Fillable([
     'name',
+    'first_name',
+    'middle_name',
+    'last_name',
     'email',
     'password',
+    'phone_number',
     'student_no',
     'department',
     'course',

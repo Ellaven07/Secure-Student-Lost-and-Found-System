@@ -27,6 +27,13 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:6,1')
         ->name('login.store');
 
+    Route::get('/visitor/register', [AuthController::class, 'showVisitorRegistration'])
+        ->name('visitor.register');
+
+    Route::post('/visitor/register', [AuthController::class, 'registerVisitor'])
+        ->middleware('throttle:6,1')
+        ->name('visitor.register.store');
+
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])
         ->name('password.request');
 

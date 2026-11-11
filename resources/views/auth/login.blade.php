@@ -92,7 +92,7 @@
                     </div>
                     <button class="submit" type="submit">Sign in to your account</button>
                 </form>
-                <p class="account-note">Students and administrators sign in with their assigned accounts. Visitors can sign in to browse verified items only.</p>
+                <p class="account-note">Students and administrators sign in with their assigned accounts. Visitors can <a href="{{ route('visitor.register') }}">create an account with a Gmail address</a> to browse verified items.</p>
                 <p class="secure-note"><span aria-hidden="true">◆</span> Your account and information are protected.</p>
             </div>
         </section>
