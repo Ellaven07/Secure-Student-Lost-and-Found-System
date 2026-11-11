@@ -55,7 +55,7 @@
             @foreach ($items as $item)
                 <a href="{{ route('student.items.show', $item->id) }}" class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cfc0] hover:shadow-md">
                     @if ($item->photo_path)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="h-48 w-full bg-[#edf4ef] object-cover">
+                        <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="h-48 w-full bg-[#edf4ef] object-cover">
                     @else
                         <div class="grid h-48 place-items-center bg-[#edf4ef] text-4xl text-[#28634c]" aria-hidden="true">{{ strtolower($item->type) === 'lost' ? '−' : '+' }}</div>
                     @endif

@@ -8,7 +8,7 @@
     <a href="{{ route('student.items.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#28634c] hover:text-[#174b38]">← Back to browse items</a>
     <article class="overflow-hidden rounded-2xl border border-[#e4eae6] bg-white shadow-sm">
         @if ($item->photo_path)
-            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="max-h-[440px] w-full bg-[#edf4ef] object-contain">
+            <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="max-h-[440px] w-full bg-[#edf4ef] object-contain">
         @else
             <div class="grid h-56 place-items-center bg-[#edf4ef] text-5xl text-[#28634c]" aria-hidden="true">{{ strtolower($item->type) === 'lost' ? '−' : '+' }}</div>
         @endif

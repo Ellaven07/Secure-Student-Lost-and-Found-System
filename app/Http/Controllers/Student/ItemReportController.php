@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -24,14 +24,14 @@ class ItemReportController extends Controller
         return $this->reportForm('found');
     }
 
-    public function storeLost(Request $request): RedirectResponse
+    public function storeLost(Request $request, SupabaseStorageService $photoStorage): RedirectResponse
     {
-        return $this->store($request, 'lost');
+        return $this->store($request, 'lost', $photoStorage);
     }
 
-    public function storeFound(Request $request): RedirectResponse
+    public function storeFound(Request $request, SupabaseStorageService $photoStorage): RedirectResponse
     {
-        return $this->store($request, 'found');
+        return $this->store($request, 'found', $photoStorage);
     }
 
     public function history(Request $request): View
@@ -68,13 +68,6 @@ class ItemReportController extends Controller
         ]);
     }
 
-    private function reportForm(string $type): View
-    {
-        $categories = DB::table('categories')->orderBy('name')->get(['id', 'name']);
-
-        return view('student.reports.create', compact('categories', 'type'));
-    }
-
     public function edit(Request $request, int $item): View
     {
         $report = $this->editableReport($item, (int) $request->user()->id);
@@ -83,7 +76,7 @@ class ItemReportController extends Controller
         return view('student.reports.edit', compact('report', 'categories'));
     }
 
-    public function update(Request $request, int $item): RedirectResponse
+    public function update(Request $request, int $item, SupabaseStorageService $photoStorage): RedirectResponse
     {
         $validated = $request->validate([
             'item_name' => ['required', 'string', 'max:150'],
@@ -95,7 +88,17 @@ class ItemReportController extends Controller
             'remove_photo' => ['nullable', 'boolean'],
         ]);
 
-        $newPhotoPath = $request->file('photo')?->store('item-reports', 'public');
+        if ($request->hasFile('photo') && $photoStorage->missingItemConfiguration() !== []) {
+            $missingSettings = implode(', ', $photoStorage->missingItemConfiguration());
+
+            return back()->withInput()->withErrors([
+                'photo' => "Item photo storage is missing server setting(s): {$missingSettings}. Configure Supabase Storage and restart the server.",
+            ]);
+        }
+
+        $newPhotoPath = $request->file('photo')
+            ? $photoStorage->uploadItemPhoto($request->file('photo'), $request->user()->id)
+            : null;
 
         if ($request->hasFile('photo') && ! $newPhotoPath) {
             return back()->withInput()->withErrors([
@@ -139,14 +142,14 @@ class ItemReportController extends Controller
             });
         } catch (Throwable $exception) {
             if ($newPhotoPath) {
-                Storage::disk('public')->delete($newPhotoPath);
+                $photoStorage->delete($newPhotoPath);
             }
 
             throw $exception;
         }
 
         if ($oldPhotoPath) {
-            Storage::disk('public')->delete($oldPhotoPath);
+            $photoStorage->delete($oldPhotoPath);
         }
 
         return redirect()
@@ -154,7 +157,7 @@ class ItemReportController extends Controller
             ->with('success', 'Your report was updated and sent back for admin review.');
     }
 
-    public function destroy(Request $request, int $item): RedirectResponse
+    public function destroy(Request $request, int $item, SupabaseStorageService $photoStorage): RedirectResponse
     {
         $photoPath = DB::transaction(function () use ($item, $request): ?string {
             $report = DB::table('items')
@@ -172,7 +175,7 @@ class ItemReportController extends Controller
         });
 
         if ($photoPath) {
-            Storage::disk('public')->delete($photoPath);
+            $photoStorage->delete($photoPath);
         }
 
         return redirect()
@@ -210,7 +213,14 @@ class ItemReportController extends Controller
         }
     }
 
-    private function store(Request $request, string $type): RedirectResponse
+    private function reportForm(string $type): View
+    {
+        $categories = DB::table('categories')->orderBy('name')->get(['id', 'name']);
+
+        return view('student.reports.create', compact('categories', 'type'));
+    }
+
+    private function store(Request $request, string $type, SupabaseStorageService $photoStorage): RedirectResponse
     {
         $validated = $request->validate([
             'item_name' => ['required', 'string', 'max:150'],
@@ -218,10 +228,22 @@ class ItemReportController extends Controller
             'description' => ['required', 'string', 'max:5000'],
             'location' => ['required', 'string', 'max:255'],
             'date_lost_or_found' => ['required', 'date', 'before_or_equal:today'],
-            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'photo' => [$type === 'found' ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        $photoPath = $request->file('photo')?->store('item-reports', 'public');
+        $missingSettings = $photoStorage->missingItemConfiguration();
+
+        if ($request->hasFile('photo') && $missingSettings !== []) {
+            $missingSettings = implode(', ', $missingSettings);
+
+            return back()->withInput()->withErrors([
+                'photo' => "Item photo storage is missing server setting(s): {$missingSettings}. Configure Supabase Storage and restart the server.",
+            ]);
+        }
+
+        $photoPath = $request->file('photo')
+            ? $photoStorage->uploadItemPhoto($request->file('photo'), $request->user()->id)
+            : null;
 
         if ($request->hasFile('photo') && ! $photoPath) {
             return back()->withInput()->withErrors([

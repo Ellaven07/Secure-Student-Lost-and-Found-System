@@ -23,7 +23,7 @@
         @forelse ($claims as $claim)
             <article class="space-y-5 border-b border-gray-100 p-5 last:border-0 sm:p-6">
                 <div class="flex flex-col gap-4 sm:flex-row">
-                    @if ($claim->photo_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($claim->photo_path) }}" alt="Photo of {{ $claim->item_name }}" class="h-24 w-full rounded-xl bg-[#edf4ef] object-cover sm:w-32">@else<div class="grid h-24 w-full shrink-0 place-items-center rounded-xl bg-[#edf4ef] text-3xl text-[#28634c] sm:w-32" aria-hidden="true">+</div>@endif
+                    @if ($claim->photo_path)<img src="{{ app(\App\Services\SupabaseStorageService::class)->url($claim->photo_path) }}" alt="Photo of {{ $claim->item_name }}" class="h-24 w-full rounded-xl bg-[#edf4ef] object-cover sm:w-32">@else<div class="grid h-24 w-full shrink-0 place-items-center rounded-xl bg-[#edf4ef] text-3xl text-[#28634c] sm:w-32" aria-hidden="true">+</div>@endif
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2"><h3 class="text-lg font-bold text-gray-800">{{ $claim->item_name }}</h3><span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide {{ strtolower($claim->status) === 'approved' ? 'bg-emerald-50 text-emerald-700' : (strtolower($claim->status) === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700') }}">{{ $claim->status }}</span></div>
                         <p class="mt-1 text-sm text-gray-500">{{ $claim->category_name ?? 'Uncategorized' }} · {{ $claim->location }} · Reported by {{ $claim->reporter_name }}</p>

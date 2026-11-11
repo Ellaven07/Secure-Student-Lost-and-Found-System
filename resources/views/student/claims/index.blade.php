@@ -39,7 +39,7 @@
                 @foreach ($claims as $claim)
                     <article class="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:p-6">
                         @if ($claim->photo_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($claim->photo_path) }}" alt="Photo of {{ $claim->item_name }}" class="h-20 w-20 shrink-0 rounded-xl object-cover">
+                            <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($claim->photo_path) }}" alt="Photo of {{ $claim->item_name }}" class="h-20 w-20 shrink-0 rounded-xl object-cover">
                         @else
                             <div class="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-[#edf4ef] text-2xl text-[#28634c]" aria-hidden="true">+</div>
                         @endif

@@ -32,6 +32,7 @@ return [
         'url' => env('SUPABASE_URL'),
         'secret_key' => env('SUPABASE_SECRET_KEY') ?: env('SUPABASE_SERVICE_ROLE_KEY'),
         'storage_bucket' => env('SUPABASE_STORAGE_BUCKET') ?: 'student-profiles',
+        'items_bucket' => env('SUPABASE_ITEM_BUCKET') ?: 'item-photos',
     ],
 
     'slack' => [

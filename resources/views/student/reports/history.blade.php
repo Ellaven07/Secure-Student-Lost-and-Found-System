@@ -55,7 +55,7 @@
                 @foreach ($reports as $report)
                     <article class="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:p-6">
                         @if ($report->photo_path)
-                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($report->photo_path) }}" alt="Photo of {{ $report->item_name }}" class="h-20 w-20 shrink-0 rounded-xl border border-gray-100 object-cover">
+                            <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($report->photo_path) }}" alt="Photo of {{ $report->item_name }}" class="h-20 w-20 shrink-0 rounded-xl border border-gray-100 object-cover">
                         @else
                             <div class="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-[#edf4ef] text-2xl text-[#28634c]" aria-hidden="true">{{ $report->type === 'lost' ? '−' : '+' }}</div>
                         @endif
