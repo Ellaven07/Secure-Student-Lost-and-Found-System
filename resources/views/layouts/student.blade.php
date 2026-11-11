@@ -105,25 +105,7 @@
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 9a7 7 0 0 0-14 0" />
                         </svg>
-                        <span>My Profile</span>
-                    </a>
-
-                    <a
-                        href="{{ route('student.notifications') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition
-                        {{ request()->routeIs('student.notifications') ? 'border-l-[3px] border-[#d7b65d] bg-[#28634c] text-white' : 'text-green-100/80 hover:bg-[#28634c] hover:text-white' }}"
-                    >
-                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" />
-                        </svg>
-
-                        <span class="flex-1">Notifications</span>
-
-                        @if (($unreadNotificationCount ?? 0) > 0)
-                            <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
-                                {{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}
-                            </span>
-                        @endif
+                        <span>Settings</span>
                     </a>
 
                 </div>

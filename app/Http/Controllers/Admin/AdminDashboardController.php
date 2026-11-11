@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -176,6 +178,166 @@ class AdminDashboardController extends Controller
             'pendingReports' => $pendingReports,
             'pendingClaims' => $pendingClaims,
         ]);
+    }
+
+    public function activityLogs(Request $request): View
+    {
+        $filters = $request->validate([
+            'user' => ['nullable', 'string', 'max:120'],
+            'action' => ['nullable', 'string', 'max:100'],
+            'role' => ['nullable', 'in:admin,student,deleted'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $logsQuery = DB::table('activity_logs')
+            ->leftJoin('users', 'users.id', '=', 'activity_logs.user_id')
+            ->select(
+                'activity_logs.id',
+                'activity_logs.user_id',
+                'activity_logs.action',
+                'activity_logs.details',
+                'activity_logs.ip_address',
+                'activity_logs.created_at',
+                'users.name as user_name',
+                'users.role as user_role',
+            );
+
+        if (! empty($filters['user'])) {
+            $logsQuery->where(function ($query) use ($filters): void {
+                $query->where('users.name', 'like', '%'.$filters['user'].'%')
+                    ->orWhere('users.email', 'like', '%'.$filters['user'].'%');
+            });
+        }
+
+        if (! empty($filters['action'])) {
+            $logsQuery->where('activity_logs.action', 'like', '%'.$filters['action'].'%');
+        }
+
+        if (($filters['role'] ?? null) === 'deleted') {
+            $logsQuery->whereNull('activity_logs.user_id');
+        } elseif (! empty($filters['role'])) {
+            $logsQuery->where('users.role', $filters['role']);
+        }
+
+        if (! empty($filters['start_date'])) {
+            $logsQuery->whereDate('activity_logs.created_at', '>=', $filters['start_date']);
+        }
+
+        if (! empty($filters['end_date'])) {
+            $logsQuery->whereDate('activity_logs.created_at', '<=', $filters['end_date']);
+        }
+
+        return view('admin.activity-logs.index', [
+            'logs' => $logsQuery->orderByDesc('activity_logs.created_at')->paginate(20)->withQueryString(),
+            'filters' => $filters,
+        ]);
+    }
+
+    public function generateReports(Request $request): View
+    {
+        $filters = $this->validatedReportFilters($request);
+        $items = $this->filteredItemReports($filters);
+
+        $summary = [
+            'lost' => (clone $items)->whereRaw('LOWER(items.type) = ?', ['lost'])->count(),
+            'found' => (clone $items)->whereRaw('LOWER(items.type) = ?', ['found'])->count(),
+            'approved' => (clone $items)->where('items.is_verified', true)->count(),
+            'rejected' => (clone $items)->whereRaw('LOWER(items.status) = ?', ['rejected'])->count(),
+            'pending' => (clone $items)->where('items.is_verified', false)->whereRaw('LOWER(items.status) != ?', ['rejected'])->count(),
+            'claimed' => (clone $items)->whereRaw('LOWER(items.status) = ?', ['claimed'])->count(),
+            'returned' => (clone $items)->whereRaw('LOWER(items.status) = ?', ['returned'])->count(),
+            'claims' => DB::table('claims')->when($filters['start_date'] ?? null, fn ($query, string $date) => $query->whereDate('created_at', '>=', $date))
+                ->when($filters['end_date'] ?? null, fn ($query, string $date) => $query->whereDate('created_at', '<=', $date))->count(),
+            'approved_claims' => DB::table('claims')->whereRaw('LOWER(status) = ?', ['approved'])
+                ->when($filters['start_date'] ?? null, fn ($query, string $date) => $query->whereDate('created_at', '>=', $date))
+                ->when($filters['end_date'] ?? null, fn ($query, string $date) => $query->whereDate('created_at', '<=', $date))->count(),
+            'rejected_claims' => DB::table('claims')->whereRaw('LOWER(status) = ?', ['rejected'])
+                ->when($filters['start_date'] ?? null, fn ($query, string $date) => $query->whereDate('created_at', '>=', $date))
+                ->when($filters['end_date'] ?? null, fn ($query, string $date) => $query->whereDate('created_at', '<=', $date))->count(),
+        ];
+
+        $reportQuery = $this->filteredItemReports($filters)
+            ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->join('users', 'users.id', '=', 'items.user_id')
+            ->select('items.id', 'items.item_name', 'items.type', 'items.status', 'items.is_verified', 'items.location', 'items.created_at', 'categories.name as category_name', 'users.name as reporter_name', 'users.department');
+
+        if (in_array($filters['report_type'] ?? '', ['lost', 'found'], true)) {
+            $reportQuery->whereRaw('LOWER(items.type) = ?', [$filters['report_type']]);
+        }
+
+        return view('admin.generate-reports.index', [
+            'filters' => $filters,
+            'summary' => $summary,
+            'reports' => $reportQuery->orderByDesc('items.created_at')->limit(500)->get(),
+            'categoryStats' => (clone $items)->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+                ->selectRaw("COALESCE(categories.name, 'Uncategorized') AS label, COUNT(items.id) AS total")
+                ->groupBy('categories.name')->orderByDesc('total')->limit(10)->get(),
+            'categories' => DB::table('categories')->orderBy('name')->get(['id', 'name']),
+            'departments' => DB::table('users')->whereNotNull('department')->where('department', '!=', '')
+                ->distinct()->orderBy('department')->pluck('department'),
+            'departmentStats' => (clone $items)->join('users', 'users.id', '=', 'items.user_id')
+                ->selectRaw("COALESCE(users.department, 'Unspecified') AS label, COUNT(items.id) AS total")
+                ->groupBy('users.department')->orderByDesc('total')->limit(10)->get(),
+            'generatedAt' => now(),
+            'adminName' => $request->user()->name,
+        ]);
+    }
+
+    public function exportGeneratedReports(Request $request): StreamedResponse
+    {
+        $filters = $this->validatedReportFilters($request);
+        $reports = $this->filteredItemReports($filters)
+            ->leftJoin('categories', 'categories.id', '=', 'items.category_id')
+            ->join('users', 'users.id', '=', 'items.user_id')
+            ->select('items.item_name', 'items.type', 'items.status', 'items.is_verified', 'items.location', 'items.created_at', 'categories.name as category_name', 'users.name as reporter_name', 'users.department')
+            ->when(in_array($filters['report_type'] ?? '', ['lost', 'found'], true), fn (Builder $query) => $query->whereRaw('LOWER(items.type) = ?', [$filters['report_type']]))
+            ->orderByDesc('items.created_at')->get();
+
+        return response()->streamDownload(function () use ($reports): void {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['Item', 'Type', 'Category', 'Reporter', 'Department', 'Location', 'Approval', 'Item Status', 'Submitted At']);
+
+            foreach ($reports as $report) {
+                fputcsv($output, [
+                    $this->csvCell($report->item_name), ucfirst(strtolower($report->type)),
+                    $this->csvCell($report->category_name ?? 'Uncategorized'), $this->csvCell($report->reporter_name),
+                    $this->csvCell($report->department ?? 'Unspecified'), $this->csvCell($report->location),
+                    $report->is_verified ? 'Approved' : 'Pending', $report->status, $report->created_at,
+                ]);
+            }
+
+            fclose($output);
+        }, 'admin-reports.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /** @return array<string, string> */
+    private function validatedReportFilters(Request $request): array
+    {
+        return $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'report_type' => ['nullable', 'in:all,lost,found,category,department'],
+            'department' => ['nullable', 'string', 'max:120'],
+            'category' => ['nullable', 'integer', 'min:1'],
+            'approval_status' => ['nullable', 'in:pending,approved,rejected'],
+            'item_status' => ['nullable', 'in:open,claimed,returned,rejected'],
+        ]);
+    }
+
+    private function filteredItemReports(array $filters): Builder
+    {
+        return DB::table('items')
+            ->when($filters['start_date'] ?? null, fn (Builder $query, string $date) => $query->whereDate('items.created_at', '>=', $date))
+            ->when($filters['end_date'] ?? null, fn (Builder $query, string $date) => $query->whereDate('items.created_at', '<=', $date))
+            ->when($filters['department'] ?? null, function (Builder $query, string $department): void {
+                $query->whereIn('items.user_id', DB::table('users')->select('id')->where('department', $department));
+            })
+            ->when($filters['category'] ?? null, fn (Builder $query, string $category) => $query->where('items.category_id', $category))
+            ->when(($filters['approval_status'] ?? null) === 'approved', fn (Builder $query) => $query->where('items.is_verified', true))
+            ->when(($filters['approval_status'] ?? null) === 'pending', fn (Builder $query) => $query->where('items.is_verified', false)->whereRaw('LOWER(items.status) != ?', ['rejected']))
+            ->when(($filters['approval_status'] ?? null) === 'rejected', fn (Builder $query) => $query->whereRaw('LOWER(items.status) = ?', ['rejected']))
+            ->when($filters['item_status'] ?? null, fn (Builder $query, string $status) => $query->whereRaw('LOWER(items.status) = ?', [$status]));
     }
 
     public function export(): StreamedResponse

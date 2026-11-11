@@ -1,7 +1,7 @@
 @extends('layouts.student')
 
-@section('title', 'Student Profile')
-@section('page-label', 'Student Profile')
+@section('title', 'Settings')
+@section('page-label', 'Settings')
 
 @section('content')
 
@@ -20,7 +20,7 @@
     <!-- Page heading -->
     <section>
         <h1 class="text-2xl font-extrabold tracking-tight text-[#174b38]">
-            My Profile
+            Settings
         </h1>
         <p class="mt-1 text-sm text-gray-500">
             Manage your student account information and security settings.
