@@ -236,6 +236,9 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
 });
 
 Route::middleware(['auth', 'role:visitor', 'frontend-preview'])->prefix('visitor')->name('visitor.')->group(function () {
+    Route::view('/profile', 'visitor.profile')
+        ->name('profile');
+
     Route::get('/items', [ItemBrowseController::class, 'index'])
         ->name('items.index');
 
