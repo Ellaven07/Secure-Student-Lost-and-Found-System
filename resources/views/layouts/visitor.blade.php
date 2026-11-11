@@ -23,7 +23,16 @@
                 </a>
 
                 <div class="flex shrink-0 items-center gap-3">
-                    <a href="{{ route('visitor.items.index') }}" class="rounded-lg bg-[#edf4ef] px-3 py-2 text-xs font-bold text-[#174b38] sm:px-4 sm:text-sm">Browse Items</a>
+                    <a href="{{ route('visitor.items.index') }}" class="hidden rounded-lg bg-[#edf4ef] px-3 py-2 text-xs font-bold text-[#174b38] sm:inline-flex sm:px-4 sm:text-sm">Browse Items</a>
+                    <div class="flex min-w-0 items-center gap-2" aria-label="Signed-in visitor profile">
+                        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38]" aria-hidden="true">
+                            {{ strtoupper(mb_substr(auth()->user()->name ?? 'V', 0, 1)) }}
+                        </div>
+                        <div class="hidden min-w-0 sm:block">
+                            <p class="max-w-36 truncate text-xs font-semibold text-gray-700">{{ auth()->user()->name }}</p>
+                            <p class="max-w-36 truncate text-[10px] text-gray-500">{{ auth()->user()->email }} · Visitor</p>
+                        </div>
+                    </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 sm:px-4 sm:text-sm">Log out</button>
