@@ -19,6 +19,95 @@
             background: #f5f7f6;
         }
 
+        .admin-user-footer {
+            flex: 0 0 auto;
+            align-self: stretch;
+            width: 100%;
+            padding: 16px 20px;
+            border-top: 1px solid rgb(255 255 255 / 10%);
+        }
+
+        .admin-user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            border-radius: 12px;
+            background: rgb(255 255 255 / 5%);
+            padding: 8px 12px 8px 0;
+        }
+
+        .admin-user-avatar {
+            display: grid;
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            place-items: center;
+            border-radius: 9999px;
+            background: #d7b65d;
+            color: #173c2d;
+            font-weight: 700;
+        }
+
+        .admin-user-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .admin-user-name {
+            margin: 0;
+            color: white;
+            overflow: hidden;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 16px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .admin-user-role {
+            margin: 4px 0 0;
+            color: rgb(220 252 231 / 70%);
+            font-size: 10px;
+            line-height: 12px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                overflow: hidden;
+            }
+
+            .admin-sidebar > nav {
+                padding-bottom: 96px;
+            }
+
+            #admin-user-footer {
+                margin: 0;
+                padding: 0;
+                border-top: 0;
+            }
+
+            #admin-user-card {
+                position: fixed !important;
+                right: auto !important;
+                bottom: 12px !important;
+                left: 24px !important;
+                width: 216px !important;
+                margin: 0 !important;
+            }
+
+            .admin-main {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 16rem;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: #9ca3af transparent;
+            }
+        }
+
         .admin-menu summary {
             display: flex;
             align-items: center;
@@ -85,7 +174,7 @@
 
     <div class="min-h-screen md:flex">
 
-        <aside class="w-full overflow-y-auto bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
+        <aside class="admin-sidebar w-full overflow-hidden bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-6">
                 <div class="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">CvSU</div>
                 <div class="min-w-0">
@@ -95,7 +184,7 @@
                 </div>
             </div>
 
-            <nav aria-label="Admin navigation" class="flex-1 px-4 py-5">
+            <nav aria-label="Admin navigation" class="min-h-0 flex-1 overflow-y-auto px-4 py-5">
                 <p class="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-green-200/70">Main Navigation</p>
 
                 <details class="admin-menu" {{ request()->is('admin/*') ? 'open' : '' }}>
@@ -142,18 +231,18 @@
                 </a>
             </nav>
 
-            <div class="border-t border-white/10 p-4">
-                <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-                    <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d7b65d] font-bold text-[#173c2d]">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
-                    <div class="min-w-0">
-                        <p class="truncate text-xs font-semibold text-white">{{ auth()->user()->name }}</p>
-                        <p class="mt-1 text-[10px] text-green-100/70">Administrator</p>
+            <div id="admin-user-footer" class="admin-user-footer">
+                <div id="admin-user-card" class="admin-user-card">
+                    <div class="admin-user-avatar">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
+                    <div class="admin-user-details">
+                        <p class="admin-user-name">{{ auth()->user()->name }}</p>
+                        <p class="admin-user-role">Administrator</p>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <div class="min-w-0 flex-1 md:ml-64">
+        <div class="admin-main min-w-0 flex-1">
 
             <header class="sticky top-0 z-10 flex min-h-[72px] items-center justify-between border-b border-gray-200 bg-white px-5 py-4 shadow-sm sm:px-8">
 
@@ -245,6 +334,10 @@
 
     </div>
 
-
+    <script>
+        window.addEventListener('pageshow', () => {
+            document.querySelector('.admin-main')?.scrollTo(0, 0);
+        });
+    </script>
 </body>
 </html>
