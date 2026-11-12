@@ -17,6 +17,10 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+        if (filled(config('services.visitor.password'))) {
+            $this->call(VisitorUserSeeder::class);
+        }
+
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',

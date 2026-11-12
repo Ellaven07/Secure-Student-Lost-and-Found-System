@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <title>@yield('title', 'Admin Dashboard') | CvSU Lost &amp; Found</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,10 +17,11 @@
     </style>
 </head>
 <body class="min-h-screen">
+    @php($profilePhotoUrl = app(\App\Services\SupabaseStorageService::class)->url(auth()->user()->profile_photo_path))
     <div class="min-h-screen md:flex">
         <aside class="w-full bg-[#174b38] text-white md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col">
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-                <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">CvSU</div>
+                <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 border-[#d7b65d] bg-white p-0.5"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal" class="h-full w-full object-contain"></div>
                 <div>
                     <h1 class="text-sm font-extrabold tracking-wide">CAVITE STATE UNIVERSITY</h1>
                     <p class="mt-1 text-xs text-green-100">Student Lost &amp; Found</p>
@@ -55,7 +57,13 @@
                         @endif
                     </a>
                     <span class="hidden text-sm font-semibold text-gray-700 sm:inline">{{ auth()->user()->name }}</span>
-                    <div class="grid h-10 w-10 place-items-center rounded-full bg-[#e8eee9] font-bold text-[#174b38]">{{ str(auth()->user()->name)->substr(0, 1)->upper() }}</div>
+                    <div class="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-[#e8eee9] font-bold text-[#174b38]">
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                        @else
+                            {{ str(auth()->user()->name)->substr(0, 1)->upper() }}
+                        @endif
+                    </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:border-[#174b38] hover:text-[#174b38]">Sign out</button>

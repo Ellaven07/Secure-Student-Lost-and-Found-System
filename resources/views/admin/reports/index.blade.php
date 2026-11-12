@@ -10,8 +10,6 @@
         <p class="mt-2 text-sm text-green-50/85">Verify reports before they appear in student Browse Items, or reject reports that need correction.</p>
     </section>
 
-    @if (session('success'))<div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>@endif
-    @if (session('error'))<div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ session('error') }}</div>@endif
     @if ($errors->any())<div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>@endif
 
     <section class="grid gap-4 sm:grid-cols-3">
@@ -34,14 +32,14 @@
                 </div>
                 @if (! $report->is_verified && strtolower($report->status) !== 'rejected')
                     <div class="flex shrink-0 flex-col gap-2 lg:w-52">
-                        <form method="POST" action="{{ route('admin.reports.verify', $report->id) }}" onsubmit="return confirm('Verify this report and make it visible in Browse Items?')">
+                        <form method="POST" action="{{ route('admin.reports.verify', $report->id) }}" data-confirm="Verify this report and make it visible in Browse Items?" data-confirm-title="Verify item report" data-confirm-label="Verify report">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="w-full rounded-lg bg-[#174b38] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#103b2b]">Verify report</button>
                         </form>
                         <details class="rounded-lg border border-red-200 bg-red-50 p-3">
                             <summary class="cursor-pointer text-center text-sm font-semibold text-red-700">Reject report</summary>
-                            <form method="POST" action="{{ route('admin.reports.reject', $report->id) }}" class="mt-3 space-y-2">
+                            <form method="POST" action="{{ route('admin.reports.reject', $report->id) }}" class="mt-3 space-y-2" data-confirm="Reject this report and send the note to the student?" data-confirm-title="Reject item report" data-confirm-label="Reject report" data-confirm-tone="danger">
                                 @csrf
                                 @method('PATCH')
                                 <label for="reason-{{ $report->id }}" class="block text-xs font-semibold text-gray-600">Reason for student</label>

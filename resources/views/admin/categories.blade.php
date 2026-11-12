@@ -222,10 +222,6 @@
         <p>Organize and manage the categories used for lost and found items.</p>
     </div>
 
-    @if (session('success'))
-        <div class="alert-success">{{ session('success') }}</div>
-    @endif
-
     @if ($errors->any())
         <div class="alert-error">
             <strong>Please check the following:</strong>
@@ -302,7 +298,10 @@
                                     method="POST"
                                     action="{{ route('admin.categories.destroy', $category->id) }}"
                                     style="display:inline;"
-                                    onsubmit="return confirm('Delete {{ addslashes($category->name) }}? Existing item reports will be preserved, but their category will be cleared.')"
+                                    data-confirm="Delete {{ $category->name }}? Existing item reports will be preserved, but their category will be cleared."
+                                    data-confirm-title="Delete category"
+                                    data-confirm-label="Delete category"
+                                    data-confirm-tone="danger"
                                 >
                                     @csrf
                                     @method('DELETE')

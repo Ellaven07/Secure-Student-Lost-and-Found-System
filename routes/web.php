@@ -27,6 +27,13 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:6,1')
         ->name('login.store');
 
+    Route::get('/visitor/register', [AuthController::class, 'showVisitorRegistration'])
+        ->name('visitor.register');
+
+    Route::post('/visitor/register', [AuthController::class, 'registerVisitor'])
+        ->middleware('throttle:6,1')
+        ->name('visitor.register.store');
+
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])
         ->name('password.request');
 
@@ -196,6 +203,18 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
     Route::get('/student/reports/history', [ItemReportController::class, 'history'])
         ->name('student.reports.history');
 
+    Route::get('/student/reports/{item}/edit', [ItemReportController::class, 'edit'])
+        ->whereNumber('item')
+        ->name('student.reports.edit');
+
+    Route::put('/student/reports/{item}', [ItemReportController::class, 'update'])
+        ->whereNumber('item')
+        ->name('student.reports.update');
+
+    Route::delete('/student/reports/{item}', [ItemReportController::class, 'destroy'])
+        ->whereNumber('item')
+        ->name('student.reports.destroy');
+
     Route::get('/student/items', [ItemBrowseController::class, 'index'])
         ->name('student.items.index');
 
@@ -214,4 +233,16 @@ Route::middleware(['auth', 'role:student', 'frontend-preview'])->group(function 
 
     Route::get('/student/claims', [ClaimController::class, 'index'])
         ->name('student.claims.index');
+});
+
+Route::middleware(['auth', 'role:visitor', 'frontend-preview'])->prefix('visitor')->name('visitor.')->group(function () {
+    Route::view('/profile', 'visitor.profile')
+        ->name('profile');
+
+    Route::get('/items', [ItemBrowseController::class, 'index'])
+        ->name('items.index');
+
+    Route::get('/items/{item}', [ItemBrowseController::class, 'show'])
+        ->whereNumber('item')
+        ->name('items.show');
 });

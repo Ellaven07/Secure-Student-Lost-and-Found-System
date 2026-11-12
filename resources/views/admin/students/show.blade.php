@@ -18,12 +18,6 @@
         </a>
     </div>
 
-    @if (session('success'))
-        <div class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
         <div class="bg-[#174b38] px-6 py-7 text-white sm:flex sm:items-center sm:justify-between">
@@ -138,7 +132,7 @@
             <div class="mt-4 flex flex-wrap gap-3">
 
                 <form action="{{ route('admin.students.status', $student) }}" method="POST"
-                      onsubmit="return confirm('Are you sure you want to change this student account status?');">
+                      data-confirm="Change this student's account status?" data-confirm-title="Change account status" data-confirm-label="Continue">
                     @csrf
                     @method('PATCH')
 

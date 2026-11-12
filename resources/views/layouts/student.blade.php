@@ -3,6 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
     <title>@yield('title', 'Student Portal') | CvSU Lost & Found</title>
 
@@ -16,6 +17,7 @@
 </head>
 
 <body class="min-h-screen bg-[#f6f8f6] font-['Poppins'] text-gray-800 antialiased">
+    @php($profilePhotoUrl = app(\App\Services\SupabaseStorageService::class)->url(auth()->user()->profile_photo_path))
 
     <div class="min-h-screen md:flex">
 
@@ -33,8 +35,8 @@
         >
             <!-- CvSU Branding -->
             <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#d7b65d] bg-white text-sm font-extrabold text-[#174b38]">
-                    CvSU
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#d7b65d] bg-white p-0.5">
+                    <img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal" class="h-full w-full object-contain">
                 </div>
 
                 <div class="min-w-0">
@@ -113,8 +115,12 @@
             <!-- Student Account and Logout -->
             <div class="border-t border-white/10 px-5 py-4">
                 <div class="mb-3 flex items-center gap-3">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#d7b65d] bg-white text-sm font-bold text-[#174b38]">
-                        {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                    <div class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d7b65d] bg-white text-sm font-bold text-[#174b38]">
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                        @else
+                            {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                        @endif
                     </div>
 
                     <div class="min-w-0">
@@ -203,8 +209,12 @@
                             <p class="text-[10px] text-gray-400">My Profile</p>
                         </div>
 
-                        <div class="grid h-9 w-9 place-items-center rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38] transition group-hover:bg-[#dce9df]">
-                            {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                        <div class="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#e8eee9] text-sm font-bold text-[#174b38] transition group-hover:bg-[#dce9df]">
+                            @if ($profilePhotoUrl)
+                                <img src="{{ $profilePhotoUrl }}" alt="Profile photo of {{ auth()->user()->name }}" class="h-full w-full object-cover">
+                            @else
+                                {{ strtoupper(mb_substr(auth()->user()->name ?? 'S', 0, 1)) }}
+                            @endif
                         </div>
                     </a>
                 </div>
@@ -212,17 +222,8 @@
 
             <!-- Page content -->
             <main class="w-full flex-1 px-4 py-7 sm:px-7 lg:px-9">
-                @if (session('success'))
-                    <div class="mx-auto mb-5 max-w-6xl rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="mx-auto mb-5 max-w-6xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                        {{ session('error') }}
-                    </div>
-                @endif
+                @if (session('success'))<div hidden data-ui-toast data-kind="success">{{ session('success') }}</div>@endif
+                @if (session('error'))<div hidden data-ui-toast data-kind="error">{{ session('error') }}</div>@endif
 
                 @if ($errors->any())
                     <div class="mx-auto mb-5 max-w-6xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -243,6 +244,8 @@
             </footer>
         </div>
     </div>
+    <div id="uiToastRoot" class="ui-toast-root" aria-live="polite" aria-atomic="false"></div>
+    <div id="uiModalRoot"></div>
 
     <script>
         function toggleStudentSidebar() {

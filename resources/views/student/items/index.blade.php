@@ -1,9 +1,13 @@
-@extends('layouts.student')
+@extends(auth()->user()->isVisitor() ? 'layouts.visitor' : 'layouts.student')
 
 @section('title', 'Browse Items')
 @section('page-label', 'Browse and Search Items')
 
 @section('content')
+@php
+    $browseRoutePrefix = auth()->user()->isVisitor() ? 'visitor' : 'student';
+@endphp
+
 <div class="mx-auto max-w-6xl space-y-6">
     <section class="rounded-2xl bg-[#174b38] px-6 py-7 text-white shadow-sm sm:px-8">
         <p class="text-xs font-bold uppercase tracking-[.18em] text-[#e2c66f]">Campus lost &amp; found</p>
@@ -11,7 +15,7 @@
         <p class="mt-2 text-sm text-green-50/85">Search verified reports from the CvSU community and see if an item matches what you are looking for.</p>
     </section>
 
-    <form method="GET" action="{{ route('student.items.index') }}" class="grid gap-3 rounded-2xl border border-[#e4eae6] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_180px_220px_auto_auto] lg:items-end">
+    <form method="GET" action="{{ route($browseRoutePrefix.'.items.index') }}" class="grid gap-3 rounded-2xl border border-[#e4eae6] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_180px_220px_auto_auto] lg:items-end">
         <div>
             <label for="search" class="mb-1.5 block text-xs font-semibold text-gray-600">Search items</label>
             <input id="search" name="search" type="search" value="{{ $filters['search'] }}" placeholder="Name, details, location..." class="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm outline-none focus:border-[#56846b] focus:ring-2 focus:ring-[#174b38]/10">
@@ -35,7 +39,7 @@
         </div>
         <button type="submit" class="rounded-lg bg-[#174b38] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#103b2b]">Search</button>
         @if ($filters['search'] !== '' || $filters['type'] !== '' || $filters['category_id'] !== '')
-            <a href="{{ route('student.items.index') }}" class="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-semibold text-gray-600 transition hover:bg-gray-50">Clear</a>
+            <a href="{{ route($browseRoutePrefix.'.items.index') }}" class="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-semibold text-gray-600 transition hover:bg-gray-50">Clear</a>
         @endif
     </form>
 
@@ -53,7 +57,7 @@
     @else
         <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($items as $item)
-                <a href="{{ route('student.items.show', $item->id) }}" class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cfc0] hover:shadow-md">
+                <a href="{{ route($browseRoutePrefix.'.items.show', $item->id) }}" class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cfc0] hover:shadow-md">
                     @if ($item->photo_path)
                         <img src="{{ app(\App\Services\SupabaseStorageService::class)->url($item->photo_path) }}" alt="Photo of {{ $item->item_name }}" class="h-48 w-full bg-[#edf4ef] object-cover">
                     @else

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <title>Sign in | CvSU Lost &amp; Found</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +19,8 @@
         .brand-panel::before { width: 480px; height: 480px; right: -220px; top: 14%; }
         .brand-panel::after { width: 340px; height: 340px; right: -150px; top: 24%; }
         .brand-head, .brand-copy, .brand-foot { position: relative; z-index: 1; }
-        .brand-mark { width: 54px; height: 54px; display: grid; place-items: center; border: 2px solid #d7b65d; border-radius: 50%; background: white; color: #174b38; font-size: 13px; font-weight: 800; }
+        .brand-mark { width: 54px; height: 54px; display: grid; place-items: center; padding: 3px; border: 2px solid #d7b65d; border-radius: 50%; background: white; }
+        .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
         .brand-title { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: .07em; }
         .brand-subtitle { margin: 5px 0 0; color: #d5e7dc; font-size: 12px; }
         .brand-copy { max-width: 470px; padding: 70px 0; }
@@ -53,7 +55,7 @@
 <body>
     <main class="login-shell">
         <section class="brand-panel" aria-label="CvSU Lost and Found">
-            <div class="brand-head"><div class="brand-mark">CvSU</div></div>
+            <div class="brand-head"><div class="brand-mark"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal"></div></div>
             <div class="brand-copy">
                 <div class="eyebrow">Cavite State University</div>
                 <h1>Good things find their way back.</h1>
@@ -64,9 +66,9 @@
 
         <section class="form-panel">
             <div class="form-wrap">
-                <div class="mobile-brand"><div class="brand-mark">CvSU</div><div><strong>CAVITE STATE UNIVERSITY</strong><span>Student Lost &amp; Found</span></div></div>
+                <div class="mobile-brand"><div class="brand-mark"><img src="{{ asset('cvsu-logo.png') }}" alt="Cavite State University seal"></div><div><strong>CAVITE STATE UNIVERSITY</strong><span>Student Lost &amp; Found</span></div></div>
                 <h2>Welcome back</h2>
-                <p class="form-intro">Sign in with your CvSU account to continue.</p>
+                <p class="form-intro">Sign in with your assigned account to continue.</p>
 
                 @if (session('status'))
                     <div class="notice" role="status">{{ session('status') }}</div>
@@ -90,7 +92,7 @@
                     </div>
                     <button class="submit" type="submit">Sign in to your account</button>
                 </form>
-                <p class="account-note">Student accounts are provided by the administrator.</p>
+                <p class="account-note">Students and administrators sign in with their assigned accounts. Visitors can <a href="{{ route('visitor.register') }}">create an account with a Gmail address</a> to browse verified items.</p>
                 <p class="secure-note"><span aria-hidden="true">◆</span> Your account and information are protected.</p>
             </div>
         </section>

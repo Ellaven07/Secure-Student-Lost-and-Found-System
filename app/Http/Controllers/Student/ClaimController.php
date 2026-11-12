@@ -24,16 +24,43 @@ class ClaimController extends Controller
             'proof_description' => ['required', 'string', 'min:20', 'max:5000'],
         ]);
 
-        $report = $this->claimableItem($item, $request->user()->id);
+        DB::transaction(function () use ($item, $request, $validated): void {
+            $report = DB::table('items')
+                ->where('id', $item)
+                ->lockForUpdate()
+                ->first();
 
-        DB::table('claims')->insert([
-            'item_id' => $report->id,
-            'claimant_id' => $request->user()->id,
-            'proof_description' => $validated['proof_description'],
-            'status' => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            abort_unless(
+                $report
+                    && strtolower($report->type) === 'found'
+                    && strtolower($report->status) === 'open'
+                    && $report->is_verified
+                    && (int) $report->user_id !== (int) $request->user()->id,
+                404,
+            );
+
+            $hasApprovedClaim = DB::table('claims')
+                ->where('item_id', $item)
+                ->whereRaw('LOWER(status) = ?', ['approved'])
+                ->exists();
+
+            $hasExistingClaim = DB::table('claims')
+                ->where('item_id', $item)
+                ->where('claimant_id', $request->user()->id)
+                ->whereIn(DB::raw('LOWER(status)'), ['pending', 'approved'])
+                ->exists();
+
+            abort_unless(! $hasApprovedClaim && ! $hasExistingClaim, 404);
+
+            DB::table('claims')->insert([
+                'item_id' => $report->id,
+                'claimant_id' => $request->user()->id,
+                'proof_description' => $validated['proof_description'],
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
 
         return redirect()
             ->route('student.claims.index')

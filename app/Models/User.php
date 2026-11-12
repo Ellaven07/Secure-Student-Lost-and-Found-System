@@ -9,8 +9,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 #[Fillable([
     'name',
+    'first_name',
+    'middle_name',
+    'last_name',
     'email',
     'password',
+    'phone_number',
     'student_no',
     'department',
     'course',
@@ -43,6 +47,11 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+
+    public function isVisitor(): bool
+    {
+        return $this->role === 'visitor';
     }
 
     public function isActive(): bool
